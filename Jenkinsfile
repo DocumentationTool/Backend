@@ -21,6 +21,7 @@ pipeline {
         stage('Move WAR to Staging Folder') {
             steps {
                 script {
+                	sh 'find . -name "*.war"'
                     sh 'mv **/build/libs/MarkDoc-Backend.war /opt/staging'
                 }
             }
