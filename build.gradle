@@ -13,7 +13,7 @@ java {
     }
 }
 
-
+//todo:jmd find out why
 bootWar {
     mainClass = 'com.wonkglorg.doc.api.DocApiApplication'
     archiveFileName = 'MarkDoc-Backend.war'
