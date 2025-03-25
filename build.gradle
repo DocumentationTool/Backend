@@ -14,14 +14,14 @@ java {
     }
 }
 
-//needed to know what to start spring over
+
 bootWar {
     mainClass = 'com.wonkglorg.doc.api.DocApiApplication'
-    // Replace with your main class path
+    archiveFileName = 'MarkDoc-Backend.war'
 }
 
 war {
-    archiveClassifier = 'plain'
+    archiveFileName = 'MarkDoc-Backend-plain.war'
 }
 
 repositories {

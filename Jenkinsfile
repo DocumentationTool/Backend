@@ -21,7 +21,7 @@ pipeline {
         stage('Move WAR to Staging Folder') {
             steps {
                 script {
-                    sh 'mv **/build/libs/*-plain.war /opt/staging'
+                    sh 'mv **/build/libs/MarkDoc-Backend.war /opt/staging'
                 }
             }
         }
@@ -37,7 +37,7 @@ pipeline {
         stage('Deploy WAR to Tomcat') {
             steps {
                 script {
-                    sh 'mv /opt/staging/*.war /opt/tomcat/webapps'
+                    sh 'mv /opt/staging/MarkDoc-Backend.war /opt/tomcat/webapps'
                 }
             }
         }
