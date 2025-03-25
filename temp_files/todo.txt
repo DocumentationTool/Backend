@@ -1,0 +1,126 @@
+----------General Info----------
+Spring backend.
+
+https://stackoverflow.com/questions/73353008/how-to-integrate-angular-in-spring-boot-using-gradle
+
+Configure gradle to first start spring and then angular frontend?
+
+create war file out of the result to deploy on a server, how to listen to the outside
+
+add basic login system just for showcasing, and so I can run it online on some server
+
+----------Building---------
+
+Build automation with jenkins
+https://www.jenkins.io/
+
+Deploy on server as war file
+
+
+----------User Permissions----------
+Create Node Tree to set permissions on directory or file level
+
+
+Permissions can be set on Group or User Level
+
+User always overwrites Group of specified
+
+When a permission is defined on a folder and underneath it a different permission is set for another folder or file the lower one takes priority
+
+
+----------Storage----------
+File paths + permissions get stored in sqlite databases
+
+Files and folder structures get stored inside whichever storage medium was defined, github, file system, remote server (sharepoint, etc.)
+
+
+
+How do I store permissions?
+Store all permutations
+
+Pros:
+    Fast Retrieval: Once the permissions are stored, they can be quickly retrieved. This approach is efficient for querying permissions, especially when a large number of files or folders are involved.
+    Simpler Permission Management: The database directly reflects the permissions structure, making it easier to track and audit.
+    No Need to Dynamically Compute Permissions: You don't have to calculate permissions on the fly every time you query the data.
+
+Cons:
+    Database Bloat: Storing all possible combinations of file/folder permissions can lead to a large number of rows in the permissions table, especially if there are many files and folders.
+    Data Redundancy: If a permission applies to many files or folders, you could be storing the same permission multiple times, leading to redundancy.
+    Updates Can Be Costly: When you change a permission for a folder or file, you might need to update many records, which can become inefficient if the number of affected files/folders is large.
+
+Store only needed ones, gives me greater control..
+Pros:
+    Less Database Bloat: You only store permissions at the folder (or higher-level) level, meaning the database doesn't grow as fast.
+    No Redundancy: You avoid having to store the same permission multiple times for each file in a folder.
+    More Flexible: You can easily change or adjust the set of files/folders that a permission applies to without needing to update multiple records in the database.
+
+Cons:
+    Performance at Query Time: Determining permissions on the fly can be slower, especially if there are many files or folders to check. For example, when retrieving permissions for a user or group, you would need to:
+        Retrieve all files/folders they have access to.
+        Programmatically check the set of files or folders they should be granted access to.
+    Complexity in Logic: You need more complex logic in your application code to handle permissions checking (e.g., retrieving all files in a folder and checking their individual permissions).
+
+
+
+
+
+
+XML Data should be generated on change into html and put into a database. Used to get quicker access to said data
+
+Elasticsearch for quick access? https://www.elastic.co/elasticsearch
+
+
+
+
+Create node tree for user permissions
+
+Seperation between user groups and individual users a group takes less priority than a specific user permission
+
+Each Path and or file can have their own permissions defined
+
+
+
+
+https://docs.gitbook.com/
+Site Plugin:
+https://maven.apache.org/plugins/maven-site-plugin/
+https://www.baeldung.com/maven-site-plugin
+
+
+https://www.baeldung.com/java-convert-xml-to-html
+
+automatically create new repo based on configs defined.
+
+
+
+//todo:jmd how to handle permissions /admins if each repo is its own self contained entity with permissions etc perhaps just a globally defined admin in the config that can manage all repos permissions?
+
+
+
+
+
+
+//converter dependency docx .xml
+https://www.convertapi.com/doc-to-xml/java
+
+
+Ant Path matching
+
+    ? matches one character
+    * matches zero or more characters
+    ** matches zero or more directories in a path
+    {spring:[a-z]+} matches the regexp [a-z]+ as a path variable named "spring"
+
+
+https://stackoverflow.com/questions/2952196/ant-path-style-patterns
+
+
+
+
+
+✅ Use MockMvc for unit tests (fast execution).
+✅ Use TestRestTemplate for integration tests.
+✅ Use RestAssured for API contract testing.
+✅ Use Cucumber for BDD-style tests.
+✅ Use Gatling for performance/load testing.
+✅ Use Testcontainers for real database interactions in tests.

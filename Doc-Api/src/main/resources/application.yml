@@ -1,0 +1,40 @@
+doc:
+  web:
+    api:
+      #Defines which cross origin urls can access what link
+      crossOrigin:
+        - origin: "http://localhost:8080"
+          path: "/**"
+        - origin: "http://localhost:4200"
+          path: "/**"
+  git:
+    repositories:
+      - id: "testRepo1"
+        path: test-temp/git/repo1
+      - id: "testRepo2"
+        path: test-temp/git/repo2
+---
+doc:
+  git:
+    repositories:
+      - id: "repo1"
+        path: temp/git/repo1
+      - id: "repo2"
+        path: temp/git/repo2
+
+spring:
+  config:
+    activate:
+      on-profile: 'dev'
+---
+doc:
+  git:
+    repositories:
+      - id: "java-docs"
+        path: temp/git/java
+      - id: "cobol-docs"
+        path: temp/git/cobol
+spring:
+    config:
+      activate:
+        on-profile: prod

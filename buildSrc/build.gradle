@@ -1,0 +1,20 @@
+plugins {
+    id 'java'
+}
+
+repositories {
+    maven {
+        url = uri("https://adoptopenjdk.jfrog.io/artifactory/adoptopenjdk")
+    }
+}
+
+description = "Defines all common build sources for the project modules."
+
+repositories {
+    mavenCentral()
+}
+
+
+dependencies {
+    println("Adding Build-Common")
+}

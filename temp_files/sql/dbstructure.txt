@@ -1,0 +1,110 @@
+Table Roles {
+ role_id String [primary key]
+ role_name String
+}
+
+Table Users {
+  user_id String [primary key]
+  password_hash String
+  created_at datetime
+  created_by String
+  last_modified_at datetime
+  last_modified_by String
+}
+
+Table UserRoles {
+  role_id String [primary key]
+  user_id String [primary key]
+}
+
+Table Groups {
+  group_id String [primary key]
+  group_name String
+  created_at datetime
+  created_by String
+  last_modified_at datetime
+  last_modified_by String
+}
+
+Table UserGroups {
+  user_id String [primary key]
+  group_id String [primary key]
+}
+
+Table Tags {
+  tag_id String [primary key]
+  tag_name String
+  created_at datetime
+  created_by String
+  last_modified_at datetime
+  last_modified_by String
+}
+
+Table Resources {
+  resource_path String [primary key]
+  category String
+  commit_id String
+  created_at datetime
+  created_by String
+  last_modified_at datetime
+  last_modified_by String
+}
+
+Table ResourceTags {
+  tag_id String [primary key]
+  resource_path String [primary key]
+  created_at datetime
+  created_by String
+}
+
+Table GroupPermissions {
+  group_id String [primary key]
+  path String [primary key]
+  permission_id String
+}
+
+Table UserPermissions {
+  user_id String [primary key]
+  path String [primary key]
+  permission_id String
+}
+
+
+Table Permissions {
+  permission_id String [primary key]
+  weight int
+}
+
+
+Table FileData {
+  resource_path String [primary key]
+  data String
+}
+
+
+Table AuditLogs {
+  log_id String [primary key]
+  user_id String
+  action String
+  affected_user_id String
+  affected_group_id String
+  affected_resource_path String
+  time_stamp datetime
+}
+
+Ref: Roles.role_id < UserRoles.role_id
+Ref: Users.user_id < UserRoles.user_id
+Ref: Users.user_id < UserGroups.user_id
+Ref: Groups.group_id < UserGroups.group_id
+
+Ref:Users.user_id < UserPermissions.user_id
+Ref:Groups.group_id < GroupPermissions.group_id
+
+
+Ref:Permissions.permission_id < UserPermissions.permission_id
+Ref:Permissions.permission_id < GroupPermissions.permission_id
+
+Ref:Resources.resource_path < ResourceTags.resource_path
+Ref:Tags.tag_id < ResourceTags.tag_id
+
+Ref: FileData.resource_path - Resources.resource_path

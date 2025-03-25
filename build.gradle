@@ -1,0 +1,48 @@
+plugins {
+    id 'java'
+    id 'war'
+    id 'org.springframework.boot' version '3.4.2'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+//todo:jmd properly configure war file
+
+group = 'com.wonkglorg'
+version = '0.8.9'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+//needed to know what to start spring over
+bootWar {
+    mainClass = 'com.wonkglorg.doc.api.DocApiApplication'
+    // Replace with your main class path
+}
+
+war {
+    archiveClassifier = 'plain'
+}
+
+repositories {
+    mavenCentral()
+}
+
+//applies to all submodules
+subprojects {
+    apply plugin: 'java'
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+
+    }
+}
+
+dependencies {
+    implementation project('Doc-Api')
+    implementation project('Doc-Core')
+}
