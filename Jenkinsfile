@@ -2,7 +2,7 @@ pipeline {
 	agent any
 
     environment {
-		WAR_NAME = "DocumentationTool-0.8.9.war"
+		WAR_NAME = "DocumentationTool-0.8.9-plain.war"
         STAGING_PATH = "/opt/staging"
     }
 
@@ -25,7 +25,8 @@ pipeline {
         stage('Move WAR to Staging Folder') {
 			steps {
 				script {
-					sh 'find . -name "*.war"'
+					// Suppress permission errors when finding WARs
+                    sh 'find . -name "*.war" 2>/dev/null'
                     sh "mv ./build/libs/${WAR_NAME} ${STAGING_PATH}"
                 }
             }
@@ -34,19 +35,19 @@ pipeline {
         stage('Stop Running App') {
 			steps {
 				script {
-					sh '''
-                        PID=$(pgrep -f "${WAR_NAME}")
-                        if [ ! -z "$PID" ]; then
-                            echo "Stopping running app (PID=$PID)..."
-                            kill $PID
-                            while kill -0 $PID 2>/dev/null; do
+					sh """
+                        PID=\$(pgrep -f "${WAR_NAME}")
+                        if [ ! -z "\$PID" ]; then
+                            echo "Stopping running app (PID=\$PID)..."
+                            kill \$PID
+                            while kill -0 \$PID 2>/dev/null; do
                                 echo "Waiting for process to stop..."
                                 sleep 1
                             done
                         else
                             echo "No running instance found."
                         fi
-                    '''
+                    """
                 }
             }
         }
@@ -54,10 +55,10 @@ pipeline {
         stage('Start WAR File') {
 			steps {
 				script {
-					sh '''
+					sh """
                         echo "Starting Spring Boot WAR..."
-                        nohup java -jar /opt/staging/DocumentationTool-0.8.9-plain.war > /opt/staging/app.log 2>&1 &
-                    '''
+                        nohup java -jar ${STAGING_PATH}/${WAR_NAME} > ${STAGING_PATH}/app.log 2>&1 &
+                    """
                 }
             }
         }
