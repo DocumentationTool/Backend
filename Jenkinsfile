@@ -25,8 +25,6 @@ pipeline {
         stage('Move WAR to Staging Folder') {
 			steps {
 				script {
-					// Suppress permission errors when finding WARs
-                    sh 'find . -name "*.war" 2>/dev/null'
                     sh "mv ./build/libs/${WAR_NAME} ${STAGING_PATH}"
                 }
             }
