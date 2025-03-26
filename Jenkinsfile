@@ -5,7 +5,10 @@ pipeline {
 		WAR_NAME = "DocumentationTool-0.8.9.war"
         STAGING_PATH = "/opt/staging"
     }
-        stage('Build Backend') {
+
+    stages{
+
+		stage('Build Backend') {
 			steps {
 				script {
 					sh 'chmod +x ./gradlew'
@@ -17,30 +20,30 @@ pipeline {
         stage('Move WAR to Staging Folder') {
 			steps {
 				script {
-                    sh "mv ./build/libs/${WAR_NAME} ${STAGING_PATH}"
+					sh "mv ./build/libs/${WAR_NAME} ${STAGING_PATH}"
                 }
             }
         }
 
-stage('Stop Running App') {
+		stage('Stop Running App') {
 			steps {
 				script {
 					sh """
-                PID=\$(pgrep -f "${WAR_NAME}" || true)
-                if [ -z "\$PID" ]; then
-                    echo "No running instance found."
-                else
-                    echo "Stopping running app (PID=\$PID)..."
-                    kill \$PID
-                    while kill -0 \$PID 2>/dev/null; do
-                        echo "Waiting for process to stop..."
-                        sleep 1
-                    done
-                fi
-            """
-        }
-    }
-}
+		                PID=\$(pgrep -f "${WAR_NAME}" || true)
+		                if [ -z "\$PID" ]; then
+		                    echo "No running instance found."
+		                else
+		                    echo "Stopping running app (PID=\$PID)..."
+		                    kill \$PID
+		                    while kill -0 \$PID 2>/dev/null; do
+		                        echo "Waiting for process to stop..."
+		                        sleep 1
+		                    done
+		                fi
+		            """
+		        }
+		    }
+		}
 
 
 
