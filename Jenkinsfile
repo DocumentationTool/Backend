@@ -1,6 +1,11 @@
 pipeline {
 	agent any
 
+    environment {
+		WAR_NAME = "DocumentationTool-0.8.9-plain.war"
+        STAGING_PATH = "/opt/staging"
+    }
+
     stages {
 		stage('Pull Latest Changes') {
 			steps {
@@ -8,59 +13,51 @@ pipeline {
             }
         }
 
-		stage('Build Backend') {
+        stage('Build Backend') {
 			steps {
 				script {
 					sh 'chmod +x ./gradlew'
-		            sh './gradlew build'
-		        }
-		    }
-		}
-
+                    sh './gradlew build'
+                }
+            }
+        }
 
         stage('Move WAR to Staging Folder') {
 			steps {
 				script {
 					sh 'find . -name "*.war"'
-                    sh 'mv ./build/libs/DocumentationTool-0.8.9-plain.war /opt/staging'
+                    sh "mv ./build/libs/${WAR_NAME} ${STAGING_PATH}"
                 }
             }
         }
 
-		stage('Shutdown Tomcat') {
-					steps {
-						script {
-							sh '''
-		                echo "Stopping Tomcat..."
-		                sudo /opt/tomcat/bin/shutdown.sh || true
-
-		                # Wait for Tomcat to actually stop
-		                while pgrep -f 'org.apache.catalina.startup.Bootstrap' > /dev/null; do
-		                    echo "Waiting for Tomcat to stop..."
-		                    sleep 1
-		                done
-
-		                echo "Tomcat stopped."
-		            '''
-		        }
-		    }
-		}
-
-
-        stage('Deploy WAR to Tomcat') {
+        stage('Stop Running App') {
 			steps {
 				script {
-					sh 'sudo rm -rf /opt/tomcat/webapps/DocumentationTool*.war'
-                    sh 'sudo rm -rf /opt/tomcat/webapps/DocumentationTool*/'
-                    sh 'sudo mv /opt/staging/DocumentationTool-0.8.9-plain.war /opt/tomcat/webapps/'
+					sh '''
+                        PID=$(pgrep -f "${WAR_NAME}")
+                        if [ ! -z "$PID" ]; then
+                            echo "Stopping running app (PID=$PID)..."
+                            kill $PID
+                            while kill -0 $PID 2>/dev/null; do
+                                echo "Waiting for process to stop..."
+                                sleep 1
+                            done
+                        else
+                            echo "No running instance found."
+                        fi
+                    '''
                 }
             }
         }
 
-        stage('Start Tomcat') {
+        stage('Start WAR File') {
 			steps {
 				script {
-					sh 'sudo /opt/tomcat/bin/startup.sh'
+					sh '''
+                        echo "Starting Spring Boot WAR..."
+                        nohup java -jar /opt/staging/DocumentationTool-0.8.9-plain.war > /opt/staging/app.log 2>&1 &
+                    '''
                 }
             }
         }
@@ -72,11 +69,11 @@ pipeline {
         }
 
         success {
-			echo 'Deployment was successful.'
+			echo '✅ Deployment was successful.'
         }
 
         failure {
-			echo 'Deployment failed.'
+			echo '❌ Deployment failed.'
         }
     }
 }
