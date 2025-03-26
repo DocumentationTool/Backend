@@ -17,6 +17,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sqlite.Function;
 
 import java.nio.file.Path;
 import java.sql.Connection;
@@ -143,6 +144,10 @@ public class UserDatabase extends SqliteDatabase<HikariDataSource> implements Us
                         DELETE FROM UserGroups WHERE group_id = OLD.group_id;
                     END;
                     """);
+
+
+            //todo:jmd properly implement this for password hashing
+            Function.create(connection,"hashPassword", ;
 
             loadAllUserGroups(connection, userGroups, groupUsers);
             loadAllUsers(connection).forEach(user -> userCache.put(user.getId(), user));
