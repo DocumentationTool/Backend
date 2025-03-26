@@ -9,6 +9,7 @@ import com.wonkglorg.doc.core.exception.client.InvalidRepoException;
 import com.wonkglorg.doc.core.exception.client.InvalidResourceException;
 import com.wonkglorg.doc.core.exception.client.InvalidTagException;
 import com.wonkglorg.doc.core.exception.client.InvalidUserException;
+import com.wonkglorg.doc.core.exception.client.ReadOnlyRepoException;
 import com.wonkglorg.doc.core.objects.RepoId;
 import com.wonkglorg.doc.core.objects.Resource;
 import com.wonkglorg.doc.core.objects.Tag;
@@ -78,7 +79,8 @@ public interface ResourceCalls{
 	 * @return true if the resource was moved false otherwise
 	 * @throws InvalidRepoException if the repoId is invalid
 	 */
-	boolean moveResource(RepoId repoId, Path oldPath, Path newPath) throws InvalidRepoException, CoreSqlException, InvalidResourceException;
+	boolean moveResource(RepoId repoId, Path oldPath, Path newPath)
+			throws InvalidRepoException, CoreSqlException, InvalidResourceException, ReadOnlyRepoException;
 	
 	//------------------- Tags -------------------
 	

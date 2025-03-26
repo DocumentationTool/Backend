@@ -89,7 +89,7 @@ public class GitRepo{
 		Path pathToDB = properties.getDbStorage();
 		
 		if(properties.isReadOnly() && pathToDB == null){
-			throw new ServiceUnavailableException("Read-only repository with no valid database reference for: %s".formatted(properties.getDbName()));
+			throw new ServiceUnavailableException("Read-only repository with no valid database reference for: '%s' this should be specified in the repository properties".formatted(properties.getDbName()));
 		}
 		
 		if(pathToDB == null){

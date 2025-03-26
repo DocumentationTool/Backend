@@ -10,6 +10,7 @@ import com.wonkglorg.doc.core.exception.client.InvalidRepoException;
 import com.wonkglorg.doc.core.exception.client.InvalidResourceException;
 import com.wonkglorg.doc.core.exception.client.InvalidTagException;
 import com.wonkglorg.doc.core.exception.client.InvalidUserException;
+import com.wonkglorg.doc.core.exception.client.ReadOnlyRepoException;
 import com.wonkglorg.doc.core.interfaces.ResourceCalls;
 import com.wonkglorg.doc.core.objects.RepoId;
 import com.wonkglorg.doc.core.objects.Resource;
@@ -220,6 +221,18 @@ public class ResourceService implements ResourceCalls{
 		
 		repoService.validateRepoId(repoFrom);
 		repoService.validateRepoId(repoTo);
+		
+		FileRepository fileRepoFrom = repoService.getRepo(repoFrom);
+		FileRepository fileRepoTo = repoService.getRepo(repoTo);
+		
+		if(fileRepoFrom.getRepoProperties().isReadOnly()){
+			throw new ReadOnlyRepoException("Repo '%s' is read only and cannot be edited!".formatted(repoFrom));
+		}
+		
+		if(fileRepoTo.getRepoProperties().isReadOnly()){
+			throw new ReadOnlyRepoException("Repo '%s' is read only and cannot be edited!".formatted(repoTo));
+		}
+		
 		//validate users in both repos
 		userService.validateUser(userId);
 		
@@ -244,9 +257,6 @@ public class ResourceService implements ResourceCalls{
 		request.setPath(pathFrom.toString());
 		request.setWithData(true);
 		request.repoId(repoFrom);
-		
-		FileRepository fileRepoFrom = repoService.getRepo(repoFrom);
-		FileRepository fileRepoTo = repoService.getRepo(repoTo);
 		
 		Resource oldResource = fileRepoFrom.getDatabase().resourceFunctions().getResources(request).stream().findFirst().orElseThrow();
 		Resource resourceToInsert = new Resource(pathTo,

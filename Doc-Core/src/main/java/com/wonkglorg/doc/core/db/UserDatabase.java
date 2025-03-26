@@ -59,6 +59,7 @@ public class UserDatabase extends SqliteDatabase<HikariDataSource> implements Us
 		//needs to be the underlying function, hakaricp's proxy connection ruins the function creation and usage
 		
 		
+		//todo:jmd I could in theory include this but it just makes no sense for pooled connections.
 		/*
 		if(connection instanceof org.sqlite.jdbc4.JDBC4Connection rawConnection){
 			

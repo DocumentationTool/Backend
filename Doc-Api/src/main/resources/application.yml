@@ -13,6 +13,10 @@ doc:
         path: test-temp/git/repo1
       - id: "testRepo2"
         path: test-temp/git/repo2
+      - id: "testRepoReadOnly"
+        path: test-temp/git/repo3
+        read-only: true
+        db-storage: "test-temp/db/repo3"
 ---
 doc:
   git:
