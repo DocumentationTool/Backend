@@ -5,14 +5,6 @@ pipeline {
 		WAR_NAME = "DocumentationTool-0.8.9.war"
         STAGING_PATH = "/opt/staging"
     }
-
-    stages {
-		stage('Pull Latest Changes') {
-			steps {
-				git 'https://github.com/DocumentationTool/Backend'
-            }
-        }
-
         stage('Build Backend') {
 			steps {
 				script {
