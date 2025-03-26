@@ -38,6 +38,7 @@ pipeline {
         stage('Deploy WAR to Tomcat') {
             steps {
                 script {
+                    sh 'sudo chown -R jenkins:jenkins /opt/tomcat/webapps'
                     sh 'mv /opt/staging/DocumentationTool-0.8.9-plain.war /opt/tomcat/webapps'
                 }
             }
