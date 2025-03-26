@@ -13,12 +13,11 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.web.SecurityFilterChain;
 
 
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT, properties = "server.port=8080")
-class RepoControllerTest{
+class RepoControllerTest extends BaseIntegrationTest{
     
-    @Autowired
-    private TestRestTemplate restTemplate;
-    
+    public RepoControllerTest() {
+        super(false);
+    }
     
     @TestConfiguration
     public class TestSecurityConfig {
@@ -30,7 +29,7 @@ class RepoControllerTest{
     
     @Test
     void canGetRepos() {
-        RestResponse restResponse = restTemplate.getForObject("/api/repo/get", RestResponse.class);
+        RestResponse restResponse = request.getForObject("/api/repo/get", RestResponse.class);
         Assertions.assertNotNull(restResponse);
     }
 }
