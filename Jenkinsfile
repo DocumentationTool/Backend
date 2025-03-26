@@ -2,7 +2,7 @@ pipeline {
 	agent any
 
     environment {
-		WAR_NAME = "DocumentationTool-0.8.9-plain.war"
+		WAR_NAME = "DocumentationTool-0.8.9.war"
         STAGING_PATH = "/opt/staging"
     }
 
@@ -34,7 +34,7 @@ pipeline {
 					steps {
 						script {
 							sh """
-		                PID=\$(pgrep -f "${WAR_NAME}" || true)
+		                PID=\$( || true)
 		                if [ ! -z "\$PID" ]; then
 		                    echo "Stopping running app (PID=\$PID)..."
 		                    kill \$PID
