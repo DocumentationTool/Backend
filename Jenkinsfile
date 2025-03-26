@@ -34,21 +34,22 @@ pipeline {
 					steps {
 						script {
 							sh """
-		                PID=\$( || true)
-		                if [ ! -z "\$PID" ]; then
+		                PID=\$(pgrep -f "${WAR_NAME}")
+		                if [ \$? -ne 0 ] || [ -z "\$PID" ]; then
+		                    echo "No running instance found."
+		                else
 		                    echo "Stopping running app (PID=\$PID)..."
 		                    kill \$PID
 		                    while kill -0 \$PID 2>/dev/null; do
 		                        echo "Waiting for process to stop..."
 		                        sleep 1
 		                    done
-		                else
-		                    echo "No running instance found."
 		                fi
 		            """
 		        }
 		    }
 		}
+
 
 
         stage('Start WAR File') {
