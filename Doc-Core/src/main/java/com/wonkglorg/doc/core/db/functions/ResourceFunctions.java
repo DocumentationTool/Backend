@@ -769,7 +769,9 @@ public class ResourceFunctions implements IDBFunctions, ResourceCalls{
 	 */
 	public void batchDelete(List<Path> resources) throws CoreSqlException, ReadOnlyRepoException {
 		log.info("Batch deleting resources for repo '{}'", database.getRepoId());
-		batchDeleteResources(resources);
+		if(database.getRepoProperties().isReadOnly()){
+			batchDeleteResources(resources);
+		}
 		resources.forEach(resourceCache::remove);
 		log.info("Batch deleted resources for repo '{}'", database.getRepoId());
 	}
@@ -782,7 +784,9 @@ public class ResourceFunctions implements IDBFunctions, ResourceCalls{
 	 */
 	public void batchUpdate(List<Resource> resources) throws CoreSqlException, ReadOnlyRepoException {
 		log.info("Batch updating resources for repo '{}'", database.getRepoId());
-		batchUpdateResources(resources);
+		if(database.getRepoProperties().isReadOnly()){
+			batchUpdateResources(resources);
+		}
 		resources.forEach(resource -> resourceCache.put(resource.resourcePath(), resource));
 	}
 	
@@ -794,7 +798,9 @@ public class ResourceFunctions implements IDBFunctions, ResourceCalls{
 	 */
 	public void batchInsert(List<Resource> resources) throws CoreSqlException, ReadOnlyRepoException {
 		log.info("Batch inserting resources for repo '{}'", database.getRepoId());
-		batchInsertResources(resources);
+		if(database.getRepoProperties().isReadOnly()){
+			batchInsertResources(resources);
+		}
 		resources.forEach(resource -> resourceCache.put(resource.resourcePath(), resource));
 	}
 	

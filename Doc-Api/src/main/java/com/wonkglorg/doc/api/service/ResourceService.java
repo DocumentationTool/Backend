@@ -324,7 +324,8 @@ public class ResourceService implements ResourceCalls{
 	}
 	
 	@Override
-	public boolean moveResource(RepoId repoId, Path oldPath, Path newPath) throws InvalidRepoException, CoreSqlException, InvalidResourceException {
+	public boolean moveResource(RepoId repoId, Path oldPath, Path newPath)
+			throws InvalidRepoException, CoreSqlException, InvalidResourceException, ReadOnlyRepoException {
 		if(!resourceExists(repoId, oldPath)){
 			throw new InvalidResourceException("Resource '%s' does not exist in repository '%s'".formatted(oldPath, repoId));
 		}

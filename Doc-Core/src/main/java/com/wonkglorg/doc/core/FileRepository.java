@@ -6,6 +6,7 @@ import com.wonkglorg.doc.core.exception.CoreException;
 import com.wonkglorg.doc.core.exception.CoreSqlException;
 import com.wonkglorg.doc.core.exception.client.InvalidTagException;
 import com.wonkglorg.doc.core.exception.client.InvalidUserException;
+import com.wonkglorg.doc.core.exception.client.ReadOnlyRepoException;
 import com.wonkglorg.doc.core.git.GitRepo;
 import static com.wonkglorg.doc.core.git.GitRepo.GitStage.ADDED;
 import static com.wonkglorg.doc.core.git.GitRepo.GitStage.MODIFIED;
@@ -76,7 +77,7 @@ public class FileRepository implements AutoCloseable{
 	 *
 	 * @throws GitAPIException if there is an error with the git repo
 	 */
-	public void initialize() throws GitAPIException, CoreException, InvalidUserException {
+	public void initialize() throws GitAPIException, CoreException, InvalidUserException, ReadOnlyRepoException {
 		log.info("Looking for repo in: '{}'", repoProperties.getPath());
 		gitRepo = new GitRepo(repoProperties);
 		Optional<Path> file = gitRepo.getSingleFile(s -> s.equalsIgnoreCase(repoProperties.getDbName()), UNTRACKED, MODIFIED, ADDED);
@@ -97,14 +98,14 @@ public class FileRepository implements AutoCloseable{
 			try{
 				log.info("Update task for repo '{}'", repoProperties.getId());
 				checkFileChanges(gitRepo.getFiles(s -> s.toLowerCase().endsWith(".md"), UNTRACKED, MODIFIED, ADDED));
-			} catch(GitAPIException | CoreException | InvalidUserException e){
+			} catch(GitAPIException | CoreException | InvalidUserException | ReadOnlyRepoException e){
 				log.error("Error while checking for changes", e);
 			}
 		}, 10, 10, TimeUnit.MINUTES);
 		
 	}
 	
-	private void checkFileChanges(Set<Path> foundFiles) throws CoreException, InvalidUserException {
+	private void checkFileChanges(Set<Path> foundFiles) throws CoreException, InvalidUserException, ReadOnlyRepoException {
 		log.info("Checking for changes in {} files", foundFiles.size());
 		
 		ResourceRequest request = new ResourceRequest();
@@ -213,7 +214,7 @@ public class FileRepository implements AutoCloseable{
 	 *
 	 * @param newFiles the files to add
 	 */
-	private void addNewFiles(List<Path> newFiles) throws CoreSqlException {
+	private void addNewFiles(List<Path> newFiles) throws CoreSqlException, ReadOnlyRepoException {
 		List<Resource> resources = new ArrayList<>();
 		for(Path file : newFiles){
 			RevCommit lastCommitDetailsForFile = gitRepo.getLastCommitDetailsForFile(file.toString());
@@ -243,7 +244,8 @@ public class FileRepository implements AutoCloseable{
 	 * @param matchingResources the resources to update
 	 * @return true if the resources have changed
 	 */
-	private int updateMatchingResources(List<Path> matchingResources, Map<Path, Resource> existingResources) throws CoreSqlException {
+	private int updateMatchingResources(List<Path> matchingResources, Map<Path, Resource> existingResources)
+			throws CoreSqlException, ReadOnlyRepoException {
 		List<Resource> resources = new ArrayList<>();
 		for(Path file : matchingResources){
 			RevCommit fileCommit = gitRepo.getLastCommitDetailsForFile(file.toString());
@@ -290,7 +292,7 @@ public class FileRepository implements AutoCloseable{
 		}
 	}
 	
-	private void deleteOldResources(List<Path> deletedResources) throws CoreSqlException {
+	private void deleteOldResources(List<Path> deletedResources) throws CoreSqlException, ReadOnlyRepoException {
 		for(Path file : deletedResources){
 			log.info("Deleting resource '{}'", file);
 			gitRepo.remove(file);

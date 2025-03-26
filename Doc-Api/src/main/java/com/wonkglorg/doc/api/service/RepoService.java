@@ -6,6 +6,7 @@ import com.wonkglorg.doc.core.RepoProperty;
 import com.wonkglorg.doc.core.exception.CoreException;
 import com.wonkglorg.doc.core.exception.client.InvalidRepoException;
 import com.wonkglorg.doc.core.exception.client.InvalidUserException;
+import com.wonkglorg.doc.core.exception.client.ReadOnlyRepoException;
 import com.wonkglorg.doc.core.objects.RepoId;
 import jakarta.annotation.PostConstruct;
 import org.apache.logging.log4j.LogManager;
@@ -53,7 +54,7 @@ public class RepoService{
 			repositories.put(repoProperty.getId(), repository);
 			try{
 				repository.initialize();
-			} catch(GitAPIException | CoreException | InvalidUserException e){
+			} catch(GitAPIException | CoreException | InvalidUserException | ReadOnlyRepoException e){
 				log.error("Failed to initialize repository '{}'", repoProperty.getId(), e);
 			}
 		}
