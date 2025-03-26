@@ -30,7 +30,7 @@ pipeline {
         stage('Shutdown Tomcat') {
             steps {
                 script {
-                    sh '/opt/tomcat/bin/shutdown.sh'
+                    sh 'sudo /opt/tomcat/bin/shutdown.sh'
                 }
             }
         }
@@ -46,7 +46,7 @@ pipeline {
         stage('Start Tomcat') {
             steps {
                 script {
-                    sh '/opt/tomcat/bin/startup.sh'
+                    sh 'sudo /opt/tomcat/bin/startup.sh'
                 }
             }
         }
