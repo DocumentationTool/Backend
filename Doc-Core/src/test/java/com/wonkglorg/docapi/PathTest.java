@@ -19,7 +19,6 @@ class PathTest {
         Assertions.assertFalse(antPath.matches("path2/file.md"));
     }
 
-
     @Test
     void antPathObjectToString() {
         AntPath antPath = new AntPath("path/**");
@@ -28,6 +27,7 @@ class PathTest {
         Assertions.assertEquals("path\\**", antPath2.toString());
         AntPath antPath3 = new AntPath("path/**/text.txt");
         Assertions.assertEquals("path\\**\\text.txt", antPath3.toString());
+        Assertions.assertNotEquals("path/**", antPath.toString());
     }
 
     @Test

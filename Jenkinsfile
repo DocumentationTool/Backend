@@ -22,7 +22,7 @@ pipeline {
             steps {
                 script {
                 	sh 'find . -name "*.war"'
-                    sh 'mv **/build/libs/MarkDoc-Backend.war /opt/staging'
+                    sh 'mv ./build/libs/DocumentationTool-0.8.9-plain.war /opt/staging'
                 }
             }
         }
@@ -38,7 +38,7 @@ pipeline {
         stage('Deploy WAR to Tomcat') {
             steps {
                 script {
-                    sh 'mv /opt/staging/MarkDoc-Backend.war /opt/tomcat/webapps'
+                    sh 'mv /opt/staging/DocumentationTool-0.8.9-plain.war /opt/tomcat/webapps'
                 }
             }
         }
