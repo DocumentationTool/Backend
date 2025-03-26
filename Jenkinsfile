@@ -2,7 +2,7 @@ pipeline {
 	agent any
 
     environment {
-		WAR_NAME = "DocumentationTool-0.8.9.war"
+		WAR_NAME = "MarkDoc-Backend.war"
         STAGING_PATH = "/opt/staging"
     }
 
