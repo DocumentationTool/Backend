@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
@@ -29,7 +30,7 @@ public class UserService implements UserCalls, GroupCalls{
 	private final UserDatabase userDatabase = new UserDatabase(Path.of("users.db"));
 	private final RepoService repoService;
 	
-	public UserService(@Lazy RepoService repoService) {
+	public UserService(@Lazy RepoService repoService) throws SQLException {
 		this.repoService = repoService;
 	}
 	
