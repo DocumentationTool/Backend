@@ -2,7 +2,7 @@ pipeline {
 	agent any
 
     environment {
-		WAR_NAME = "DocumentationTool-0.8.9-plain.war"
+		WAR_NAME = "DocumentationTool-0.8.9.war"
         STAGING_PATH = "/opt/staging"
     }
 
