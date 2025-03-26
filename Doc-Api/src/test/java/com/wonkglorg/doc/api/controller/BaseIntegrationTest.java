@@ -26,7 +26,7 @@ import java.util.Map;
 
 import static java.lang.Thread.sleep;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = "server.port=8080")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = "server.port=8091")
 public class BaseIntegrationTest {
 
     private static boolean deleteOnExit = false;

@@ -30,7 +30,6 @@ class RepoControllerTest{
     
     @Test
     void canGetRepos() {
-        
         RestResponse restResponse = restTemplate.getForObject("/api/repo/get", RestResponse.class);
         Assertions.assertNotNull(restResponse);
     }
