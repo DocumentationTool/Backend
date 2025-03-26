@@ -54,10 +54,12 @@ sh 'find . -name "*.war"'
         stage('Start WAR File') {
 			steps {
 				script {
-					sh """
-                        echo "Starting Spring Boot WAR..."
-                        nohup java -jar ${STAGING_PATH}/${WAR_NAME} > ${STAGING_PATH}/app.log 2>&1 &
-                    """
+					sh '''
+  						echo Starting Spring Boot WAR...
+  						nohup java -jar /opt/staging/MarkDoc-Backend.war > /opt/staging/nohup.out 2>&1 &
+  						sleep 5
+  						pgrep -f MarkDoc-Backend.war || echo "⚠️ WAR failed to start"
+					'''
                 }
             }
         }
