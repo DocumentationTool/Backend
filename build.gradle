@@ -23,6 +23,27 @@ war {
     archiveFileName = 'MarkDoc-Backend-plain.war'
 }
 
+tasks.register('aggregateJavadoc', Javadoc) {
+    description = 'Generates aggregated Javadoc for all Java subprojects.'
+    group = 'Documentation'
+    destinationDir = file("$buildDir/docs/javadoc")
+
+    // Delay setup until all subprojects are evaluated
+    doLast {
+        println "✅ Aggregated Javadoc generated at: $destinationDir"
+    }
+}
+
+afterEvaluate {
+    tasks.named('aggregateJavadoc', Javadoc).configure {
+        def javaProjects = subprojects.findAll { it.plugins.hasPlugin('java') }
+
+        source = files(javaProjects.collect { it.sourceSets.main.allJava })
+        classpath = files(javaProjects.collect { it.sourceSets.main.compileClasspath })
+    }
+}
+
+
 repositories {
     mavenCentral()
 }

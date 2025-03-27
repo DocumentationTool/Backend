@@ -5,7 +5,6 @@ import com.wonkglorg.doc.core.db.RepositoryDatabase;
 import com.wonkglorg.doc.core.exception.CoreException;
 import com.wonkglorg.doc.core.exception.CoreSqlException;
 import com.wonkglorg.doc.core.exception.client.ClientException;
-import com.wonkglorg.doc.core.exception.client.InvalidRepoException;
 import com.wonkglorg.doc.core.exception.client.ReadOnlyRepoException;
 import com.wonkglorg.doc.core.interfaces.ResourceCalls;
 import com.wonkglorg.doc.core.objects.*;
@@ -780,7 +779,6 @@ public class ResourceFunctions implements IDBFunctions, ResourceCalls {
      * Batch deletes resources from the database
      *
      * @param resources the resources to delete
-     * @return the row count affected, -1 if an error occurred
      */
     public void batchDelete(List<Path> resources) throws CoreSqlException, ReadOnlyRepoException {
         log.info("Batch deleting resources for repo '{}'", database.getRepoId());
@@ -795,7 +793,6 @@ public class ResourceFunctions implements IDBFunctions, ResourceCalls {
      * Batch updates resources in the database
      *
      * @param resources the resources to update
-     * @return the row count affected, -1 if an error occurred
      */
     public void batchUpdate(List<Resource> resources) throws CoreSqlException, ReadOnlyRepoException {
         log.info("Batch updating resources for repo '{}'", database.getRepoId());
@@ -809,7 +806,6 @@ public class ResourceFunctions implements IDBFunctions, ResourceCalls {
      * Batch inserts resources into the database
      *
      * @param resources the resources to insert
-     * @return the row count affected, -1 if an error occurred
      */
     public void batchInsert(List<Resource> resources) throws CoreSqlException, ReadOnlyRepoException {
         log.info("Batch inserting resources for repo '{}'", database.getRepoId());
@@ -820,7 +816,7 @@ public class ResourceFunctions implements IDBFunctions, ResourceCalls {
     }
 
     @Override
-    public List<Tag> getTags(RepoId repoId) throws InvalidRepoException {
+    public List<Tag> getTags(RepoId repoId) {
         return new ArrayList<>(tagCache.values());
     }
 

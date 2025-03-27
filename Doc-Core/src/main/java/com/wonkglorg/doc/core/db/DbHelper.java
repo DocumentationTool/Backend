@@ -68,7 +68,6 @@ public class DbHelper{
 	 * Checks if a path is allowed
 	 *
 	 * @param path the path to check
-	 * @return null if the path is allowed, otherwise a message explaining why it is not allowed
 	 */
 	public static void validatePath(Path path) throws InvalidPathException {
 		if(path == null){
@@ -109,7 +108,6 @@ public class DbHelper{
 	 * Checks if a path is allowed
 	 *
 	 * @param path the path to check
-	 * @return null if the path is allowed, otherwise a message explaining why it is not allowed
 	 */
 	public static void validateFileType(Path path) throws InvalidPathException {
 		if(!path.toString().endsWith(".md")){

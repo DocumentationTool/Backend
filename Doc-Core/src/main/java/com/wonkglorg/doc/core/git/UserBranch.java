@@ -42,7 +42,6 @@ public class UserBranch {
      * Adds a file to the user branch (stages the file) this should be called everytime this file changes, before committing
      *
      * @param file The file to add
-     * @throws GitAPIException If an error occurs while adding the file
      */
     public void addFile(Path file) {
         Git git = repo.getGit();

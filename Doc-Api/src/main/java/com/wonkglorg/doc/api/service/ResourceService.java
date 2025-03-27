@@ -156,7 +156,6 @@ public class ResourceService implements ResourceCalls{
 	 * Inserts a resource into the database
 	 *
 	 * @param resource the resource
-	 * @return the response
 	 */
 	@Override
 	public void insertResource(Resource resource) throws ClientException, CoreException {

@@ -19,14 +19,15 @@ pipeline {
             }
         }
 
-        stage('Generate Javadoc') {
+	stage('Generate Aggregated Javadoc') {
 			steps {
 				script {
-					sh './gradlew customJavadoc'
-                    sh 'ls -al build/docs/javadoc || echo "No Javadoc generated"'
-                }
-            }
-        }
+					sh './gradlew aggregateJavadoc'
+            		sh 'ls -al build/docs/javadoc || echo "No Javadoc generated"'
+        	}
+    	}
+	}
+
 
         stage('Publish Javadoc') {
 			steps {

@@ -9,10 +9,23 @@ import org.springframework.http.ResponseEntity;
 public record RestResponse<T>(String message, String error, T content) {
 
 
+    /**
+     * Creates a new response object
+     * @param message the message
+     * @param content the content
+     * @return the response object
+     * @param <T> the type of the content
+     */
     public static <T> RestResponse<T> success(String message, T content) {
         return new RestResponse<>(message, null, content);
     }
 
+    /**
+     * Creates a new successful response object
+     * @param content the content
+     * @return the response object
+     * @param <T> the type of the content
+     */
     public static <T> RestResponse<T> success(T content) {
         return new RestResponse<>(null, null, content);
     }
