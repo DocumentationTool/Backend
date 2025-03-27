@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Manages all repositories (ALWAYS LAZY LOAD)
+ * Manages all repositories
  */
 @Component
 @Service
@@ -50,7 +50,7 @@ public class RepoService{
 		repositories.clear();
 		for(RepoProperty repoProperty : properties.getRepositories()){
 			log.info("Adding Repo '{}'", repoProperty.getId());
-			FileRepository repository = new FileRepository(repoProperty, userService.getUserDatabase());
+			FileRepository repository = new FileRepository(repoProperty);
 			repositories.put(repoProperty.getId(), repository);
 			try{
 				repository.initialize();

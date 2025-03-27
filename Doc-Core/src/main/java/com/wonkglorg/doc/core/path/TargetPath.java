@@ -25,7 +25,12 @@ public class TargetPath{
 			this.path = normalizePath(Path.of(path));
 		}
 	}
-	
+
+	/**
+	 * Creates a new TargetPath object from a path if null is given returns an empty target path
+	 * @param path the path to create the object from
+	 * @return the created TargetPath object
+	 */
 	public static TargetPath of(String path) {
 		return new TargetPath(path);
 	}
@@ -44,7 +49,7 @@ public class TargetPath{
 	}
 	
 	/**
-	 * Normalizes the path to the correct one to be specified in the database
+	 * Normalizes the path
 	 *
 	 * @param path the path to normalize
 	 * @return the normalized path
@@ -52,13 +57,21 @@ public class TargetPath{
 	public static Path normalizePath(Path path) {
 		return Path.of(normalizePath(path.toString()));
 	}
-	
+
+	/**
+	 * Normalizes the path from any os specifc path seperators
+	 * @param path the path to normalize
+	 * @return the normalized path
+	 */
 	public static String normalizePath(String path) {
 		return path.replace("/", "\\").replace("\\\\", "\\").replace("//", "\\");
 	}
-	
+
+	/**
+ 	 * @return true if a path is present
+	 */
 	public boolean isPresent() {
-		return path != null && antPath != null;
+		return path != null || antPath != null;
 	}
 	
 	public Path getPath() {

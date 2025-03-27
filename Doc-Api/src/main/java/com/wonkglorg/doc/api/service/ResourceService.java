@@ -33,6 +33,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Service managing all resource related operations
+ */
 @Component
 @Service
 public class ResourceService implements ResourceCalls{

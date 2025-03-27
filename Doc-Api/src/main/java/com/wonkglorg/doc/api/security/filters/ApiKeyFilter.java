@@ -12,12 +12,10 @@ import java.io.IOException;
 import static com.wonkglorg.doc.api.DocApiApplication.DEV_MODE;
 
 /**
- * Validates the requests api key
+ * Validates the requests api key //UNUSED NOT NEEDED ANYMORE
  */
-@Component
 public class ApiKeyFilter extends OncePerRequestFilter {
 	private static final String API_KEY_HEADER = "Authorization";
-	//todo:jmd add api key here to be used in frontend
 	private static final String API_KEY = "your-secret-api-key";
 
 	@Override

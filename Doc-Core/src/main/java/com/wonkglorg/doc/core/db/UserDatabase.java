@@ -28,6 +28,7 @@ import static com.wonkglorg.doc.core.hash.BCryptUtils.hashPassword;
  * Database containing the users information
  */
 public class UserDatabase extends SqliteDatabase<HikariDataSource> implements UserCalls, GroupCalls {
+
     private static final Logger log = LoggerFactory.getLogger(UserDatabase.class);
     /**
      * The cache of user profiles for this database

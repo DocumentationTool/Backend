@@ -7,10 +7,13 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.scheduling.annotation.EnableAsync;
 
+/**
+ * The main entry point for the Doc API
+ */
 @SpringBootApplication
 @EnableAsync
 @EnableCaching
-public class DocApiApplication extends SpringBootServletInitializer{ //use servelet initializer to statically make it accesible from the war
+public class DocApiApplication extends SpringBootServletInitializer{ //extend SpringBootServletInitializer to allow for deployment to a servlet container
 	/**
 	 * Bypasses permissions and allows full access to all endpoints
 	 */

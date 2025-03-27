@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+/**
+ * Component hanlding user authentication
+ */
 @Component
 public class UserAuthenticationManager{
 	

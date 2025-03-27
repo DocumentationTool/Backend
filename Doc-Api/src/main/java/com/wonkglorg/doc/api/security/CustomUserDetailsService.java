@@ -18,16 +18,14 @@ import java.util.stream.Collectors;
 import static com.wonkglorg.doc.api.DocApiApplication.DEV_MODE;
 
 /**
- *
+ * Custom UserDetailsService for Spring Security to load and verify users
  */
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserService userService;
-    private UserAuthenticationManager authManager;
 
-    public CustomUserDetailsService(UserAuthenticationManager authManager, UserService userService) {
-        this.authManager = authManager;
+    public CustomUserDetailsService(UserService userService) {
         this.userService = userService;
     }
 
@@ -40,22 +38,18 @@ public class CustomUserDetailsService implements UserDetailsService {
                             new SimpleGrantedAuthority("ROLE_ADMIN")));
         }
 
+        UserProfile user = null;
+        try {
+            user = userService.getUser(userId);
+        } catch (InvalidUserException e) {
+            throw new UsernameNotFoundException("User not found", e);
+        }
 
-        //todo:jmd this won't work how to properly handle that 1 locale cache for users? instead of per repo? otherwise this won't work but probably just leave it
-		
-		UserProfile user = null;
-		try{
-			user = userService.getUser(userId);
-		} catch(InvalidUserException e){
-			throw new UsernameNotFoundException("User not found", e);
-		}
-		
-		List<GrantedAuthority> authorities =
+        List<GrantedAuthority> authorities =
                 user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.name()))
                         .collect(Collectors.toList());
 
-        //todo:jmd add back password hash
-        return new User(user.getId().id(), "", authorities);
+        return new User(user.getId().id(), user.getPasswordHash(), authorities);
     }
 }
 

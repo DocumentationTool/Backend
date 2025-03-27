@@ -12,9 +12,21 @@ import java.util.Set;
  * Represents a users profile
  */
 public class UserProfile{
+	/**
+	 * The id of the user
+	 */
 	private final UserId id;
+	/**
+	 * The password hash of the user
+	 */
 	private final String passwordHash;
+	/**
+	 * The groups the user is a member of
+	 */
 	private final Set<GroupId> groups = new HashSet<>();
+	/**
+	 * The roles the user has
+	 */
 	private final Set<Role> roles = new HashSet<>();
 	
 	public UserProfile(UserId id, String password, Set<GroupId> groups, Set<Role> roles) {

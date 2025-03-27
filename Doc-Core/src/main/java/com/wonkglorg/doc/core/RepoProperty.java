@@ -5,11 +5,11 @@ import com.wonkglorg.doc.core.objects.RepoId;
 import java.nio.file.Path;
 
 /**
- * Represents a single repository that is being managed by the application
+ * Represents the properties of a single repository that is being managed by the application
  */
 public class RepoProperty {
     /**
-     * If no repo is defined uses this index to generate automatic id's
+     * If no repo id is defined uses this index to generate automatic id's to ensure uniqueness
      */
     private static int idIndex = 0;
     /**

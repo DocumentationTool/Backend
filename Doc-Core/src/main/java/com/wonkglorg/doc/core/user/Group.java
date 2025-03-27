@@ -8,13 +8,31 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Represents a group in the database
+ */
 public class Group {
+    /**
+     * The unique identifier for this group
+     */
     private final GroupId id;
+    /**
+     * The name of the group
+     */
     private String name;
 
+    /**
+     * The user who created the group
+     */
     private String createdBy;
+    /**
+     * The date the group was created
+     */
     private LocalDateTime creationDate;
 
+    /**
+     * The users in the group
+     */
     private final Set<UserId> userIds = new HashSet<>();
 
     public Group(GroupId id, String name, String createdBy, LocalDateTime creationDate) {

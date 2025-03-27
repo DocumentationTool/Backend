@@ -5,6 +5,9 @@ import io.jsonwebtoken.Jwts;
 import javax.crypto.SecretKey;
 import java.util.Date;
 
+/**
+ * Utility class for handling JWT tokens
+ */
 public class JwtUtil {
 	private static final SecretKey SECRET_KEY = Jwts.SIG.HS256.key().build();
 	private static final long EXPIRATION_TIME = 1000 * 60 * 60L; // 1 hour
