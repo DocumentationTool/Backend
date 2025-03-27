@@ -1,7 +1,4 @@
-package com.wonkglorg.doc.core.exception;
-
-import com.wonkglorg.doc.core.exception.client.ClientException;
-import com.wonkglorg.doc.core.objects.RepoId;
+package com.wonkglorg.doc.core.exception.client;
 
 public class ResourceException extends ClientException {
     public ResourceException() {

@@ -1,7 +1,7 @@
 package com.wonkglorg.doc.core.exception.client;
 
 /**
- * Thrown when a tag already exists but shouldn't, in cases of insertions or moves.
+ * Specialisation of a {@link ClientException} that is thrown when a tag already exists but shouldn't for the operation
  */
 public class TagExistsException extends ClientException {
   public TagExistsException() {

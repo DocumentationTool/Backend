@@ -1,5 +1,9 @@
 package com.wonkglorg.doc.core.exception.client;
 
+
+/**
+ * Specialisation of a {@link ClientException} that is thrown when a resource is invalid
+ */
 public class InvalidResourceException extends ClientException {
     public InvalidResourceException() {
     }

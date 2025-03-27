@@ -1,5 +1,8 @@
 package com.wonkglorg.doc.core.exception.client;
 
+/**
+ * Specialisation of a {@link ClientException} that is thrown when a user is invalid
+ */
 public class InvalidUserException extends ClientException{
 	public InvalidUserException() {
 	}

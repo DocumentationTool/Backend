@@ -1,5 +1,8 @@
 package com.wonkglorg.doc.core.exception.client;
 
+/**
+ * Specialisation of a {@link ClientException} that is thrown when a tag is invalid
+ */
 public class InvalidTagException extends ClientException{
 	public InvalidTagException() {
 	}

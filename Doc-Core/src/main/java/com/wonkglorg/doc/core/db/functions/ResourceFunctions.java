@@ -75,7 +75,7 @@ public class ResourceFunctions implements IDBFunctions, ResourceCalls{
 				resourceCache.put(resource.resourcePath(), resource);
 			}
 			
-			var allTags = getAllTags(connection);
+			var allTags = loadAllTags(connection);
 			for(Tag tag : allTags){
 				tagCache.put(tag.tagId(), tag);
 			}
@@ -108,7 +108,14 @@ public class ResourceFunctions implements IDBFunctions, ResourceCalls{
 			throw new CoreSqlException("Failed to get all resources", e);
 		}
 	}
-	
+
+	/**
+	 * Fetches all tags for a resource
+	 * @param connection the connection to the database
+	 * @param path the path to the resource
+	 * @return a map of tags
+	 * @throws SQLException if an error occurs while fetching the tags
+	 */
 	private static Map<TagId, Tag> fetchTagsForResources(Connection connection, String path) throws SQLException {
 		Map<TagId, Tag> tags = new HashMap<>();
 		String query = """
@@ -126,8 +133,14 @@ public class ResourceFunctions implements IDBFunctions, ResourceCalls{
 		}
 		return tags;
 	}
-	
-	private List<Tag> getAllTags(Connection connection) throws CoreSqlException {
+
+	/**
+	 * Fetches all tags from the database
+	 * @param connection the connection to the database
+	 * @return a list of tags
+	 * @throws CoreSqlException if an error occurs while fetching the tags
+	 */
+	private List<Tag> loadAllTags(Connection connection) throws CoreSqlException {
 		List<Tag> tags = new ArrayList<>();
 		try(PreparedStatement statement = connection.prepareStatement("SELECT * FROM Tags")){
 			ResultSet resultSet = statement.executeQuery();
@@ -139,7 +152,16 @@ public class ResourceFunctions implements IDBFunctions, ResourceCalls{
 			throw new CoreSqlException("Failed to get all tags", e);
 		}
 	}
-	
+
+	/**
+	 * Helper method to create a resource from a result set
+	 * @param resultSet the result set
+	 * @param tags the tags for the resource
+	 * @param data the data for the resource
+	 * @param database the database
+	 * @return the resource
+	 * @throws SQLException if an error occurs while fetching the resource
+	 */
 	private static Resource resourceFromResultSet(ResultSet resultSet, Set<TagId> tags, String data, RepositoryDatabase database)
 			throws SQLException {
 		return new Resource(Path.of(resultSet.getString("resource_path")),
@@ -274,10 +296,10 @@ public class ResourceFunctions implements IDBFunctions, ResourceCalls{
 	/**
 	 * Updates the tags of a resource (removes all existing tags and replaces them with the new tags)
 	 *
-	 * @param connection
-	 * @param resourcePath
-	 * @param tags
-	 * @return
+	 * @param connection the connection to the database
+	 * @param resourcePath the path to the resource
+	 * @param tags the tags to update the resource with
+	 * @return the number of rows affected
 	 */
 	private void updateResourceTagsSet(Connection connection, Path resourcePath, Set<TagId> tags) throws CoreSqlException {
 		try(PreparedStatement statement = connection.prepareStatement("DELETE FROM ResourceTags WHERE resource_path = ?")){
@@ -325,10 +347,10 @@ public class ResourceFunctions implements IDBFunctions, ResourceCalls{
 	/**
 	 * Updates the tags of a resource (removes the tags from the resource)
 	 *
-	 * @param connection
-	 * @param resourcePath
-	 * @param tags
-	 * @return
+	 * @param connection the connection to the database
+	 * @param resourcePath the path to the resource
+	 * @param tags the tags to remove from the resource
+	 * @return the number of rows affected
 	 */
 	private void updateResourceTagsRemove(Connection connection, Path resourcePath, Set<TagId> tags) throws CoreSqlException {
 		try(PreparedStatement statement = connection.prepareStatement("DELETE FROM ResourceTags WHERE resource_path = ? AND tag_id = ?")){
@@ -347,10 +369,10 @@ public class ResourceFunctions implements IDBFunctions, ResourceCalls{
 	/**
 	 * Updates the tags of a resource (adds the tags to the resource)
 	 *
-	 * @param connection
-	 * @param resourcePath
-	 * @param tags
-	 * @return
+	 * @param connection the connection to the database
+	 * @param resourcePath the path to the resource
+	 * @param tags the tags to add to the resource
+	 * @return the number of rows affected
 	 */
 	private void updateResourceTagsAdd(Connection connection, Path resourcePath, Set<TagId> tags) throws CoreSqlException {
 		try(PreparedStatement statement = connection.prepareStatement("INSERT INTO ResourceTags(resource_path, tag_id) VALUES(?, ?)")){
@@ -558,7 +580,7 @@ public class ResourceFunctions implements IDBFunctions, ResourceCalls{
 											  request.blacklistTags().isEmpty() ||
 											  !entry.getValue().hasAnyTagId(request.blacklistTags()))
 							 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-		return new ArrayList<>(resources.values());
+		return resources.values().stream().limit(request.getReturnLimit()).collect(Collectors.toList());
 	}
 	
 	@Override

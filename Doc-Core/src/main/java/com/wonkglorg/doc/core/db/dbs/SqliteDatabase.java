@@ -46,7 +46,11 @@ public class SqliteDatabase<T extends DataSource> extends Database<T>{
 	@Override
 	public void close() {
 	}
-	
+
+	/**
+	 * Get a connection to the database from the datasource
+	 * @return the connection
+	 */
 	public Connection getConnection() {
 		try{
 			return dataSource.getConnection();

@@ -50,7 +50,7 @@ public class PermissionFunctions implements IDBFunctions, PermissionCalls{
 			}
 			
 			for(Group group : userDB.getGroups()){
-				Set<Permission<GroupId>> permissions = getPermissionsForGroup(connection, group.getId());
+				Set<Permission<GroupId>> permissions = loadPermissionsForGroup(connection, group.getId());
 				for(Permission<GroupId> permission : permissions){
 					groupPermissions.computeIfAbsent(group.getId(), k -> new HashMap<>()).put(permission.getPath().toString(), permission);
 				}
@@ -86,8 +86,15 @@ public class PermissionFunctions implements IDBFunctions, PermissionCalls{
 		}
 		
 	}
-	
-	public Set<Permission<GroupId>> getPermissionsForGroup(Connection connection, GroupId groupId) throws CoreSqlException {
+
+	/**
+	 * Get the permissions for a group from the database
+	 * @param connection the connection to the database
+	 * @param groupId the group to get permissions for
+	 * @return a set of permissions for the group
+	 * @throws CoreSqlException if there is an error while getting the permissions
+	 */
+	public Set<Permission<GroupId>> loadPermissionsForGroup(Connection connection, GroupId groupId) throws CoreSqlException {
 		try(var statement = connection.prepareStatement("SELECT group_id,type,path FROM GroupPermissions WHERE group_id = ?")){
 			statement.setString(1, groupId.toString());
 			try(var rs = statement.executeQuery()){
@@ -115,7 +122,8 @@ public class PermissionFunctions implements IDBFunctions, PermissionCalls{
 			log.error("Error while closing connection", e);
 		}
 	}
-	
+
+
 	@Override
 	public boolean addPermissionToGroup(RepoId repoId, Permission<GroupId> permission) {
 		log.info("Adding permission '{}' to group '{}' in repo '{}'", permission.getPath(), permission.getId(), repoId.id());
@@ -342,7 +350,11 @@ public class PermissionFunctions implements IDBFunctions, PermissionCalls{
 			closeConnection(connection);
 		}
 	}
-	
+
+	/**
+	 * Cleans up the user when it is no longer available, should be called when a user is removed by the {@link UserDatabase}
+	 * @param userId the user to clean up
+	 */
 	public void cleanUpUser(UserId userId) {
 		Connection connection = database.getConnection();
 		try(var statement = connection.prepareStatement("DELETE FROM UserPermissions WHERE user_id = ?")){

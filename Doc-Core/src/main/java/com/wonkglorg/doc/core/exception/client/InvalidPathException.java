@@ -1,5 +1,8 @@
 package com.wonkglorg.doc.core.exception.client;
 
+/**
+ * Specialisation of a {@link ClientException} that is thrown when a path is invalid
+ */
 public class InvalidPathException extends ClientException{
 	public InvalidPathException() {
 	}

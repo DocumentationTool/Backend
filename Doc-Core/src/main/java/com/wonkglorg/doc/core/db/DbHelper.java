@@ -104,7 +104,13 @@ public class DbHelper{
 					normalizePath(pathStr)));
 		}
 	}
-	
+
+	/**
+	 * Checks if a path is allowed
+	 *
+	 * @param path the path to check
+	 * @return null if the path is allowed, otherwise a message explaining why it is not allowed
+	 */
 	public static void validateFileType(Path path) throws InvalidPathException {
 		if(!path.toString().endsWith(".md")){
 			throw new InvalidPathException("Path '%s' file type is not allowed, only .md files are allowed".formatted(normalizePath(path.toString())));

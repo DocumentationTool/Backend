@@ -26,6 +26,19 @@ public class DatabaseFunctions {
      */
     public static void initializeDatabase(RepositoryDatabase database) throws CoreSqlException {
         Connection connection = database.getConnection();
+
+
+
+        /*
+        	Function.create(rawConnection, "normalizePath", new Function(){
+				@Override
+				protected void xFunc() throws SQLException {
+					String password = value_text(0);
+					result(TargetPath.normalizePath(path));
+				}
+			});
+         */
+
         try (Statement statement = connection.createStatement()) {
             statement.execute("PRAGMA foreign_keys = OFF");
             statement.execute("PRAGMA auto_vacuum = INCREMENTAL");

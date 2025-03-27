@@ -19,84 +19,92 @@ import java.nio.file.Path;
  * Represents the database object for a defined repository
  */
 @SuppressWarnings("UnusedReturnValue")
-public class RepositoryDatabase extends SqliteDatabase<HikariDataSource>{
-	
-	private static final Logger log = LoggerFactory.getLogger(RepositoryDatabase.class);
-	private final PermissionFunctions permissionFunctions;
-	private final ResourceFunctions resourceFunctions;
-	private final FileRepository fileRepository;
-	/**
-	 * The properties of the repository
-	 */
-	private final RepoProperty repoProperties;
-	
-	public RepositoryDatabase(RepoProperty repoProperties, Path openInPath, FileRepository fileRepository) {
-		super(getDataSource(openInPath));
-		this.fileRepository = fileRepository;
-		this.repoProperties = repoProperties;
-		this.resourceFunctions = new ResourceFunctions(this);
-		this.permissionFunctions = new PermissionFunctions(this);
-	}
-	
-	public RepositoryDatabase(RepoProperty repoProperties, FileRepository fileRepository) {
-		this(repoProperties, repoProperties.getPath().resolve(repoProperties.getDbName()), fileRepository);
-	}
-	
-	/**
-	 * Retrieves the data source for the current sql connection
-	 *
-	 * @param openInPath the path to open the data source in
-	 * @return the created data source
-	 */
-	private static HikariDataSource getDataSource(Path openInPath) {
-		HikariConfig hikariConfig = new HikariConfig();
-		hikariConfig.setLeakDetectionThreshold(1000);
-		hikariConfig.setJdbcUrl(SQLITE.driver() + openInPath.toString());
-		return new HikariDataSource(hikariConfig);
-	}
-	
-	/**
-	 * Initializes the database for the current repo (creating tables, triggers, etc.)
-	 */
-	public void initialize() throws CoreSqlException {
-		log.info("Initialising Database for repo '{}'", repoProperties.getId());
-		try{
-			DatabaseFunctions.initializeDatabase(this);
-			log.info("Creating triggers");
-			DatabaseFunctions.initializeTriggers(this);
-			//todo:jmd add more triggers for users
-		} catch(RuntimeException e){
-			log.error("Error while initializing Database for repo '{}'", repoProperties.getId(), e);
-		}
-		log.info("Database initialized for repo '{}'", repoProperties.getId());
-		resourceFunctions.initialize();
-		permissionFunctions.initialize();
-	}
-	
-	/**
-	 * Rebuilds the entire FTS table to remove any unused records
-	 */
-	public void rebuildFts() throws CoreSqlException {
-		DatabaseFunctions.rebuildFts(this);
-	}
-	
-	public RepoId getRepoId() {
-		return repoProperties.getId();
-	}
-	
-	public RepoProperty getRepoProperties() {
-		return repoProperties;
-	}
-	
-	public ResourceFunctions resourceFunctions() {
-		return resourceFunctions;
-	}
-	
-	public PermissionFunctions permissionFunctions() {
-		return permissionFunctions;
-	}
-	
-	public FileRepository getFileRepository() {
-		return fileRepository;
-	}
+public class RepositoryDatabase extends SqliteDatabase<HikariDataSource> {
+
+    private static final Logger log = LoggerFactory.getLogger(RepositoryDatabase.class);
+    /**
+     * Permission functions related to this database
+     */
+    private final PermissionFunctions permissionFunctions;
+    /**
+     * Resource functions related to this database
+     */
+    private final ResourceFunctions resourceFunctions;
+    /**
+     * The file repository this database is part of
+     */
+    private final FileRepository fileRepository;
+    /**
+     * The properties of the repository
+     */
+    private final RepoProperty repoProperties;
+
+    public RepositoryDatabase(RepoProperty repoProperties, Path openInPath, FileRepository fileRepository) {
+        super(getDataSource(openInPath));
+        this.fileRepository = fileRepository;
+        this.repoProperties = repoProperties;
+        this.resourceFunctions = new ResourceFunctions(this);
+        this.permissionFunctions = new PermissionFunctions(this);
+    }
+
+    public RepositoryDatabase(RepoProperty repoProperties, FileRepository fileRepository) {
+        this(repoProperties, repoProperties.getPath().resolve(repoProperties.getDbName()), fileRepository);
+    }
+
+    /**
+     * Retrieves the data source for the current sql connection
+     *
+     * @param openInPath the path to open the data source in
+     * @return the created data source
+     */
+    private static HikariDataSource getDataSource(Path openInPath) {
+        HikariConfig hikariConfig = new HikariConfig();
+        hikariConfig.setLeakDetectionThreshold(1000);
+        hikariConfig.setJdbcUrl(SQLITE.driver() + openInPath.toString());
+        return new HikariDataSource(hikariConfig);
+    }
+
+    /**
+     * Initializes the database for the current repo (creating tables, triggers, etc.)
+     */
+    public void initialize() throws CoreSqlException {
+        log.info("Initialising Database for repo '{}'", repoProperties.getId());
+        try {
+            DatabaseFunctions.initializeDatabase(this);
+            log.info("Creating triggers");
+            DatabaseFunctions.initializeTriggers(this);
+        } catch (RuntimeException e) {
+            log.error("Error while initializing Database for repo '{}'", repoProperties.getId(), e);
+        }
+        log.info("Database initialized for repo '{}'", repoProperties.getId());
+        resourceFunctions.initialize();
+        permissionFunctions.initialize();
+    }
+
+    /**
+     * Rebuilds the entire FTS table to remove any unused records
+     */
+    public void rebuildFts() throws CoreSqlException {
+        DatabaseFunctions.rebuildFts(this);
+    }
+
+    public RepoId getRepoId() {
+        return repoProperties.getId();
+    }
+
+    public RepoProperty getRepoProperties() {
+        return repoProperties;
+    }
+
+    public ResourceFunctions resourceFunctions() {
+        return resourceFunctions;
+    }
+
+    public PermissionFunctions permissionFunctions() {
+        return permissionFunctions;
+    }
+
+    public FileRepository getFileRepository() {
+        return fileRepository;
+    }
 }

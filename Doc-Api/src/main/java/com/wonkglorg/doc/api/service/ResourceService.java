@@ -4,7 +4,7 @@ import com.wonkglorg.doc.core.FileRepository;
 import com.wonkglorg.doc.core.db.DbHelper;
 import com.wonkglorg.doc.core.exception.CoreException;
 import com.wonkglorg.doc.core.exception.CoreSqlException;
-import com.wonkglorg.doc.core.exception.ResourceException;
+import com.wonkglorg.doc.core.exception.client.ResourceException;
 import com.wonkglorg.doc.core.exception.client.ClientException;
 import com.wonkglorg.doc.core.exception.client.InvalidRepoException;
 import com.wonkglorg.doc.core.exception.client.InvalidResourceException;

@@ -18,14 +18,8 @@ public interface PermissionCalls{
 	/**
 	 * Adds a permission to a group
 	 *
-	 * @param repoId the repo to add the permission to
-	 * @param groupId the group to add the permission to
+	 * @param repoId the repo to add the permission in
 	 * @param permission the permission to add
-	 * @return
-	 * @throws CoreException
-	 * @throws InvalidRepoException
-	 * @throws InvalidGroupException
-	 * @throws InvalidUserException
 	 */
 	boolean addPermissionToGroup(RepoId repoId, Permission<GroupId> permission) throws CoreException, ClientException;
 	
@@ -40,12 +34,10 @@ public interface PermissionCalls{
 	boolean removePermissionFromGroup(RepoId repoId, GroupId groupId, TargetPath path) throws CoreException, ClientException;
 	
 	/**
-	 * Updates a permission in a group
+	 * Updates a permission in a group this will fail if the group does not already have a matching permission path, or if the group does not exist
 	 *
 	 * @param repoId the repo to update the permission in
-	 * @param path the path to update the permission for
-	 * @param groupId the group to update the permission for
-	 * @param type the new permission type
+	 * @param permission the permission to update
 	 * @return true if the permission was updated
 	 * @throws CoreException if the permission could not be updated
 	 * @throws ClientException if the permission is invalid
@@ -53,7 +45,7 @@ public interface PermissionCalls{
 	boolean updatePermissionForGroup(RepoId repoId, Permission<GroupId> permission) throws CoreException, ClientException;
 	
 	/**
-	 * Adds a permission to a group
+	 * Adds a permission to a user
 	 *
 	 * @param repoId the repo to add the permission to
 	 * @param permission the permission to add
@@ -62,7 +54,7 @@ public interface PermissionCalls{
 	boolean addPermissionToUser(RepoId repoId, Permission<UserId> permission) throws CoreException, ClientException;
 	
 	/**
-	 * Removes a permission from a group
+	 * Removes a permission from a user
 	 *
 	 * @param repoId the repo to remove the permission from
 	 * @param userId the user to remove the permission from
@@ -72,7 +64,7 @@ public interface PermissionCalls{
 	boolean removePermissionFromUser(RepoId repoId, UserId userId, TargetPath path) throws CoreException, ClientException;
 	
 	/**
-	 * Updates a permission in a group
+	 * Updates a permission in a user
 	 *
 	 * @param repoId the repo to update the permission in
 	 * @param permission the permission to update
@@ -83,7 +75,7 @@ public interface PermissionCalls{
 	boolean updatePermissionForUser(RepoId repoId, Permission<UserId> permission) throws CoreException, ClientException;
 	
 	/**
-	 * Gets the permissions for a user
+	 * Gets the permissions for a user, this does not include the permissions for the groups the user is in those must be fetched separately from {@link #getPermissionsForGroup(RepoId, GroupId)}
 	 *
 	 * @param repoId the repo
 	 * @param userId the user
