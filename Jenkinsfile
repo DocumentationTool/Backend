@@ -33,7 +33,7 @@ pipeline {
 			steps {
 				script {
 					sh "echo 🧹 Cleaning old Javadoc..."
-                	sh "sudo rm -rf ${JAVADOC_DEPLOY_PATH}/*"
+                	sh "rm -rf ${JAVADOC_DEPLOY_PATH}/*"
 					sh "mkdir -p ${JAVADOC_DEPLOY_PATH}"
                     sh "cp -r ${JAVADOC_PATH}/* ${JAVADOC_DEPLOY_PATH}/"
                     echo "✅ Javadoc published to ${JAVADOC_DEPLOY_PATH}"
