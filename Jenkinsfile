@@ -48,6 +48,7 @@ pipeline {
                 }
             }
         }
+        /*
 
         stage('Stop Running App') {
 			steps {
@@ -82,18 +83,35 @@ pipeline {
             }
         }
     }
+    */
+
+
+    stage('Restart MarkDoc Service') {
+			steps {
+				script {
+					sh '''
+					echo "Restarting MarkDoc systemd service..."
+					sudo systemctl restart markdoc.service
+					sleep 5
+					sudo systemctl status markdoc.service || echo "⚠️ Service failed to start"
+				'''
+}
+			}
+		}
+	}
+
 
     post {
-		always {
-			echo 'Pipeline execution finished.'
+			always {
+				echo 'Pipeline execution finished.'
         }
 
         success {
-			echo '✅ Deployment was successful.'
+				echo '✅ Deployment was successful.'
         }
 
         failure {
-			echo '❌ Deployment failed.'
+				echo '❌ Deployment failed.'
         }
     }
 }

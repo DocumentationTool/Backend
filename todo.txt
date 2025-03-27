@@ -1,7 +1,0 @@
-properly make the site accesible from markdoc.net
-
-Fix build script backend
-
-make seperate buildscript for frontend.
-
-

@@ -1,3 +1,39 @@
+
+steps setup:
+
+mkdir /etc/systemd/system/markdoc.service
+
+
+stage('Restart MarkDoc Service') {
+	steps {
+		script {
+			sh '''
+				echo "Restarting MarkDoc systemd service..."
+				sudo systemctl restart markdoc.service
+				sleep 5
+				sudo systemctl status markdoc.service || echo "⚠️ Service failed to start"
+			'''
+		}
+	}
+}
+
+
+
+
+sudo systemctl daemon-reexec
+sudo systemctl daemon-reload
+sudo systemctl enable markdoc.service
+sudo systemctl start markdoc.service
+
+
+
+
+
+
+
+
+
+
 ----------General Info----------
 Spring backend.
 
@@ -124,3 +160,16 @@ https://stackoverflow.com/questions/2952196/ant-path-style-patterns
 ✅ Use Cucumber for BDD-style tests.
 ✅ Use Gatling for performance/load testing.
 ✅ Use Testcontainers for real database interactions in tests.
+
+
+
+
+
+
+
+
+
+
+
+
+
