@@ -4,9 +4,11 @@ pipeline {
     environment {
 		WAR_NAME = "MarkDoc-Backend.war"
         STAGING_PATH = "/opt/staging"
+        JAVADOC_PATH = "build/docs/javadoc"
+        JAVADOC_DEPLOY_PATH = "/var/www/html/javadoc" // change this as needed
     }
 
-    stages{
+    stages {
 
 		stage('Build Backend') {
 			steps {
@@ -17,49 +19,62 @@ pipeline {
             }
         }
 
+        stage('Generate Javadoc') {
+			steps {
+				script {
+					sh './gradlew customJavadoc'
+                    sh 'ls -al build/docs/javadoc || echo "No Javadoc generated"'
+                }
+            }
+        }
+
+        stage('Publish Javadoc') {
+			steps {
+				script {
+					sh "mkdir -p ${JAVADOC_DEPLOY_PATH}"
+                    sh "cp -r ${JAVADOC_PATH}/* ${JAVADOC_DEPLOY_PATH}/"
+                    echo "✅ Javadoc published to ${JAVADOC_DEPLOY_PATH}"
+                }
+            }
+        }
+
         stage('Move WAR to Staging Folder') {
 			steps {
 				script {
-					sh 'ls -al ./build/libs || true'
-sh 'find . -name "*.war"'
-
 					sh "mv ./build/libs/${WAR_NAME} ${STAGING_PATH}"
                 }
             }
         }
 
-		stage('Stop Running App') {
+        stage('Stop Running App') {
 			steps {
 				script {
 					sh """
-		                PID=\$(pgrep -f "${WAR_NAME}" || true)
-		                if [ -z "\$PID" ]; then
-		                    echo "No running instance found."
-		                else
-		                    echo "Stopping running app (PID=\$PID)..."
-		                    kill \$PID
-		                    while kill -0 \$PID 2>/dev/null; do
-		                        echo "Waiting for process to stop..."
-		                        sleep 1
-		                    done
-		                fi
-		            """
-		        }
-		    }
-		}
-
-
-
+                        PID=\$(pgrep -f "${WAR_NAME}" || true)
+                        if [ -z "\$PID" ]; then
+                            echo "No running instance found."
+                        else
+                            echo "Stopping running app (PID=\$PID)..."
+                            kill \$PID
+                            while kill -0 \$PID 2>/dev/null; do
+                                echo "Waiting for process to stop..."
+                                sleep 1
+                            done
+                        fi
+                    """
+                }
+            }
+        }
 
         stage('Start WAR File') {
 			steps {
 				script {
 					sh '''
-  						echo Starting Spring Boot WAR...
-  						nohup java -jar /opt/staging/MarkDoc-Backend.war > /opt/staging/nohup.out 2>&1 &
-  						sleep 5
-  						pgrep -f MarkDoc-Backend.war || echo "⚠️ WAR failed to start"
-					'''
+                        echo Starting Spring Boot WAR...
+                        nohup java -jar /opt/staging/MarkDoc-Backend.war > /opt/staging/nohup.out 2>&1 &
+                        sleep 5
+                        pgrep -f MarkDoc-Backend.war || echo "⚠️ WAR failed to start"
+                    '''
                 }
             }
         }
