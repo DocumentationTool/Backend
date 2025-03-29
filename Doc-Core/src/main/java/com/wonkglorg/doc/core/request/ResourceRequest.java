@@ -47,6 +47,28 @@ public class ResourceRequest{
 	 */
 	private int returnLimit = 999999999;
 	
+	public ResourceRequest(String searchTerm,
+						   TargetPath path,
+						   RepoId repoId,
+						   UserId userId,
+						   Set<TagId> whitelistTags,
+						   Set<TagId> blacklistTags,
+						   boolean withData,
+						   int returnLimit) {
+		this.searchTerm = searchTerm;
+		this.path = path == null ? TargetPath.of((String) null) : path;
+		this.repoId = repoId == null ? RepoId.ALL_REPOS : repoId;
+		this.userId = userId == null ? UserId.ALL_USERS : userId;
+		this.whitelistTags = whitelistTags == null ? new HashSet<>() : whitelistTags;
+		this.blacklistTags = blacklistTags == null ? new HashSet<>() : blacklistTags;
+		this.withData = withData;
+		this.returnLimit = returnLimit;
+	}
+	
+	public ResourceRequest() {
+		repoId = RepoId.ALL_REPOS;
+		userId = UserId.ALL_USERS;
+	}
 	
 	public TargetPath targetPath() {
 		return path;
@@ -91,9 +113,6 @@ public class ResourceRequest{
 	public void blacklistTags(Set<TagId> blacklistTags) {
 		this.blacklistTags = blacklistTags;
 	}
-	
-	
-	
 	
 	//-----mappings for rest objects
 	public String getSearchTerm() {

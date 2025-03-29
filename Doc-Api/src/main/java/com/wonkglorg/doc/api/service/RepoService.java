@@ -1,5 +1,6 @@
 package com.wonkglorg.doc.api.service;
 
+import com.wonkglorg.doc.api.properties.ProfileProperties;
 import com.wonkglorg.doc.api.properties.RepoProperties;
 import com.wonkglorg.doc.core.FileRepository;
 import com.wonkglorg.doc.core.RepoProperty;
@@ -33,11 +34,11 @@ public class RepoService{
 	private final Map<RepoId, FileRepository> repositories = new HashMap<>();
 	
 	private final RepoProperties properties;
-	private final UserService userService;
+	private final ProfileProperties profileProperties;
 	
-	public RepoService(RepoProperties properties, UserService userService) {
+	public RepoService(RepoProperties properties, ProfileProperties profileProperties) {
 		this.properties = properties;
-		this.userService = userService;
+		this.profileProperties = profileProperties;
 	}
 	
 	public Map<RepoId, FileRepository> getRepositories() {
@@ -50,7 +51,7 @@ public class RepoService{
 		repositories.clear();
 		for(RepoProperty repoProperty : properties.getRepositories()){
 			log.info("Adding Repo '{}'", repoProperty.getId());
-			FileRepository repository = new FileRepository(repoProperty);
+			FileRepository repository = new FileRepository(repoProperty, profileProperties.isMemoryDatabase());
 			repositories.put(repoProperty.getId(), repository);
 			try{
 				repository.initialize();

@@ -61,9 +61,9 @@ public class ResourceService implements ResourceCalls{
 		if(request.repoId().isAllRepos()){ //gets resources from all repos
 			List<Resource> allResources = new ArrayList<>();
 			for(var repo : repoService.getRepositories().values()){
-				request.repoId(repo.getRepoProperties().getId());
+				request.repoId(repo.getRepoProperty().getId());
 				try{
-					List<Resource> resourcesFromRepo = getResourcesFromRepo(repo.getRepoProperties().getId(), request);
+					List<Resource> resourcesFromRepo = getResourcesFromRepo(repo.getRepoProperty().getId(), request);
 					
 					if(resourcesFromRepo != null && !resourcesFromRepo.isEmpty()){
 						allResources.addAll(resourcesFromRepo);
@@ -198,9 +198,9 @@ public class ResourceService implements ResourceCalls{
 		
 		FileRepository repo = repoService.getRepo(repoId);
 		repo.getDatabase().resourceFunctions().removeResource(repoId, path);
-		if(Files.exists(repo.getRepoProperties().getPath().resolve(path))){
+		if(Files.exists(repo.getRepoProperty().getPath().resolve(path))){
 			try{
-				Files.delete((repo.getRepoProperties().getPath().resolve(path)));
+				Files.delete((repo.getRepoProperty().getPath().resolve(path)));
 				return false;
 			} catch(IOException e){
 				throw new CoreException("Failed to delete resource '%s'".formatted(normalizePath(path.toString())), e);
@@ -227,11 +227,11 @@ public class ResourceService implements ResourceCalls{
 		FileRepository fileRepoFrom = repoService.getRepo(repoFrom);
 		FileRepository fileRepoTo = repoService.getRepo(repoTo);
 		
-		if(fileRepoFrom.getRepoProperties().isReadOnly()){
+		if(fileRepoFrom.getRepoProperty().isReadOnly()){
 			throw new ReadOnlyRepoException("Repo '%s' is read only and cannot be edited!".formatted(repoFrom));
 		}
 		
-		if(fileRepoTo.getRepoProperties().isReadOnly()){
+		if(fileRepoTo.getRepoProperty().isReadOnly()){
 			throw new ReadOnlyRepoException("Repo '%s' is read only and cannot be edited!".formatted(repoTo));
 		}
 		

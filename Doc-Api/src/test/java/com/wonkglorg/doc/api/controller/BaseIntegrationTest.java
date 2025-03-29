@@ -68,12 +68,12 @@ public class BaseIntegrationTest {
             repository.close();
             //needs small delay to properly unlock the file
             sleep(500);
-            RepoProperty repoProperties = repository.getRepoProperties();
+            RepoProperty repoProperties = repository.getRepoProperty();
             Path pathToRemove = repoProperties.getPath();
             if (repoProperties.isReadOnly()) {
                 pathToRemove = repoProperties.getDbStorage();
             }
-            //deleteDirectoryRecursively(pathToRemove);
+            deleteDirectoryRecursively(pathToRemove);
         }
     }
 

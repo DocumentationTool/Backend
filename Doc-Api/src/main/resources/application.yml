@@ -48,3 +48,16 @@ spring:
   config:
     activate:
       on-profile: prod
+
+---
+doc:
+  git:
+    repositories:
+      - id: "java-docs"
+        path: temp/git/java
+      - id: "cobol-docs"
+        path: temp/git/cobol
+spring:
+  config:
+    activate:
+      on-profile: prod

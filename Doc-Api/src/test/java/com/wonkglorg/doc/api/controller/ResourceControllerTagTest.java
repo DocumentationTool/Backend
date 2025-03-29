@@ -4,6 +4,8 @@ import com.wonkglorg.doc.core.objects.RepoId;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
 class ResourceControllerTagTest extends BaseIntegrationTest{
 	
 	public ResourceControllerTagTest() {
@@ -20,11 +22,13 @@ class ResourceControllerTagTest extends BaseIntegrationTest{
 		Assertions.assertNull(request.postForObject("/api/resource/tag/add?repoId='repo1'&tagId='tag1'", null, RestResponse.class));
 		RepoId repoId = repoService.getRepositories().keySet().iterator().next();
 		
-		removeTag(repoId.id(), "tag1");
 		//can't fail otherwise removetag did not work
 		addTag(repoId.id(), "tag1", "Tag Name", true);
 		//can and should fail because it already exists
 		addTag(repoId.id(), "tag1", "Tag Name", false);
+		addTag(repoId.id(), "tag2", "Tag Name2", true);
+		
+		removeTag(repoId.id(), "tag1");
 		
 		getTag(repoId.id());
 	}
@@ -52,11 +56,13 @@ class ResourceControllerTagTest extends BaseIntegrationTest{
 	}
 	
 	private void getTag(String repoId) {
-		RestResponse<?> restResponse = request.postForObject("/api/resource/tag/get?repoId=%s".formatted(repoId), null, RestResponse.class);
+		RestResponse<Map<String, String>> restResponse = request.postForObject("/api/resource/tag/get?repoId=%s".formatted(repoId),
+				null,
+				RestResponse.class);
 		if(restResponse.error() != null){
 			Assertions.fail("Resource insertion marked as no fail, failed with error: '%s'".formatted(restResponse.error()));
 		} else {
-			Assertions.assertNull(restResponse.message());
+			Assertions.assertEquals(restResponse.content(), Map.of("tag2", "Tag Name2"));
 		}
 	}
 	
