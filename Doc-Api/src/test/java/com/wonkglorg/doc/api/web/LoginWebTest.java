@@ -113,6 +113,8 @@ class LoginWebTest{
 		}
 	}
 	
+	//todo:jmd make it nicer for show and slower too? or perhaps step through it with breaks? during presentation?
+	
 	@Test
 	void resourceTest() throws InterruptedException {
 		driver.get("http://localhost:4200");
