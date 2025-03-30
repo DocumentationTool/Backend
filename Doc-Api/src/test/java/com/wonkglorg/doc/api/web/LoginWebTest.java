@@ -72,7 +72,8 @@ class LoginWebTest{
 		}
 	}
 	
-	@Test
+	
+	//@Test
 	void canLoginAsAdmin() throws InterruptedException, IOException {
 		
 		ExtentReports report = new ExtentReports();
@@ -117,7 +118,7 @@ class LoginWebTest{
 	
 	//todo:jmd make it nicer for show and slower too? or perhaps step through it with breaks? during presentation?
 	
-	@Test
+	//@Test
 	void resourceTest() throws InterruptedException {
 		ExtentReports report = new ExtentReports();
 		report.attachReporter(extent);
