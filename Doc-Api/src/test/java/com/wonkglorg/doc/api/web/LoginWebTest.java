@@ -4,12 +4,16 @@ import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.ExtentTest;
 import com.aventstack.extentreports.Status;
 import com.aventstack.extentreports.reporter.ExtentSparkReporter;
+import com.aventstack.extentreports.reporter.configuration.Theme;
 import com.wonkglorg.doc.api.service.RepoService;
 import com.wonkglorg.doc.api.service.UserService;
+import com.wonkglorg.doc.core.FileRepository;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -25,10 +29,16 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT, properties = "server.port=8080")
 class LoginWebTest{
@@ -47,6 +57,7 @@ class LoginWebTest{
 	private WebDriver driver;
 	
 	private ExtentSparkReporter extent;
+	private static Set<Path> tempDirs = new HashSet<>();
 	
 	@BeforeEach
 	public void setup() {
@@ -57,6 +68,12 @@ class LoginWebTest{
 		driver.manage().window().maximize();
 		String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
 		extent = new ExtentSparkReporter("target/extent-reports/login-web-test-%s.html".formatted(timestamp));
+		
+		for(var property : repoService.getRepositories().entrySet()){
+			FileRepository repository = property.getValue();
+			Path path = repository.getDatabase().getRepoProperties().getPath();
+			tempDirs.add(path);
+		}
 	}
 	
 	@Test
@@ -98,9 +115,55 @@ class LoginWebTest{
 	
 	@Test
 	void resourceTest() throws InterruptedException {
-		
 		driver.get("http://localhost:4200");
 		
+		selectAdminprofile(driver);
+		
+		
+		createResource(driver);
+		
+		Thread.sleep(2000);
+		
+		WebElement treeNavigation = driver.findElement(By.className("nav"));
+		treeNavigation.click();
+		
+		Thread.sleep(2000);
+		WebElement repoTreeNode = driver.findElement(By.xpath("//li[contains(@class, 'ng-star-inserted') and contains(., 'resource.md')]"));
+		Assertions.assertTrue(repoTreeNode.isDisplayed(), "Resource should be visible after uploading");
+		
+		repoTreeNode.click();
+		Actions actions = new Actions(driver);
+		
+		//locate repoTreeNode
+		WebElement resource = repoTreeNode.findElements(By.className("ng-star-inserted")).get(1);
+		
+		editResource(driver, resource);
+		
+		Thread.sleep(1000);
+		
+		Thread.sleep(1000);
+		
+		actions.moveToElement(resource).perform();
+		
+		//deleting resource
+		//click small 3 dots
+		repoTreeNode.findElements(By.className("menu-button")).get(1).click();
+		
+		Thread.sleep(1000);
+		//click delete repoTreeNode
+		WebElement deleteButton = driver.findElement(By.xpath("//div[contains(@class, 'popup-menu')]//li[text()='Delete resource']"));
+		deleteButton.click();
+		Thread.sleep(1000);
+		
+		//click confirm alert
+		Alert alert = driver.switchTo().alert();
+		alert.accept();
+		
+		Assertions.assertTrue(!resource.isDisplayed(), "Resource should not be visible after deleting");
+		
+	}
+	
+	private void selectAdminprofile(WebDriver driver) throws InterruptedException {
 		WebElement profileField = driver.findElement(By.className("profile"));
 		profileField.click();
 		
@@ -113,6 +176,11 @@ class LoginWebTest{
 		
 		WebElement adminField = driver.findElement(By.className("nav-admin"));
 		Assertions.assertTrue(adminField.isDisplayed(), "Admin field should be visible after selecting Admin");
+		
+	}
+	
+	private void createResource(WebDriver driver) throws InterruptedException {
+		//creating resource
 		
 		WebElement insertResource = driver.findElement(By.className("createNewFile"));
 		Assertions.assertTrue(insertResource.isDisplayed(), "Insert Resource should be visible after selecting Admin");
@@ -142,26 +210,23 @@ class LoginWebTest{
 		WebElement uploadButton = driver.findElement(By.className("upload-btn"));
 		uploadButton.click();
 		
-		Thread.sleep(2000);
-		
-		WebElement treeNavigation = driver.findElement(By.className("nav"));
-		treeNavigation.click();
-		Thread.sleep(2000);
-		WebElement resource = driver.findElement(By.xpath("//li[contains(@class, 'ng-star-inserted') and contains(., 'resource.md')]"));
-		Assertions.assertTrue(resource.isDisplayed(), "Resource should be visible after uploading");
-		
+	}
+	
+	private void editResource(WebDriver driver, WebElement resource) throws InterruptedException {
 		resource.click();
 		
-		
-		
-		Actions actions = new Actions(driver);
-		actions.moveToElement(resource).perform();
-		
 		Thread.sleep(1000);
 		
-		WebElement optionsButton = driver.findElement(By.className("popup-menu"));
-		optionsButton.click();
-		Thread.sleep(1000);
+		//click edit mode
+		driver.findElement(By.className("preview")).click();
+		
+		//insert some text
+		driver.findElement(By.className("ace_text-input")).sendKeys("Test");
+		
+		//back to preview
+		driver.findElement(By.className("preview")).click();
+		
+		driver.findElement(By.className("ri-save-line")).click();
 		
 	}
 	
@@ -170,6 +235,43 @@ class LoginWebTest{
 		if(driver != null){
 			driver.quit();
 		}
+	}
+	
+	@AfterAll
+	static void cleanUp() {
+		
+		for(Path path : tempDirs){
+			try{
+				deleteDirectoryRecursively(path);
+			} catch(IOException e){
+				e.printStackTrace();
+			}
+		}
+		
+	}
+	
+	private static void deleteDirectoryRecursively(Path path) throws IOException {
+		Files.walkFileTree(path, new SimpleFileVisitor<>(){
+			@Override
+			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+				try{
+					Files.delete(file);
+				} catch(Exception e){
+					file.toFile().deleteOnExit();
+				}
+				return FileVisitResult.CONTINUE;
+			}
+			
+			@Override
+			public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+				try{
+					Files.delete(dir);
+				} catch(Exception e){
+					dir.toFile().deleteOnExit();
+				}
+				return FileVisitResult.CONTINUE;
+			}
+		});
 	}
 }
 
