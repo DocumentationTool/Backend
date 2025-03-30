@@ -101,29 +101,31 @@ public class FileRepository implements AutoCloseable{
 	 */
 	public void initialize() throws GitAPIException, CoreException, InvalidUserException, ReadOnlyRepoException {
 		log.info("Looking for repo in: '{}'", repoProperty.getPath());
-		gitRepo = new GitRepo(repoProperty);
-		Optional<Path> file = gitRepo.getSingleFile(s -> s.equalsIgnoreCase(repoProperty.getDbName()), UNTRACKED, MODIFIED, ADDED);
-		
-		if(file.isEmpty()){
-			log.info("No Database in '{}'. Creating new Database.", repoProperty.getDbName());
-		}
 		
 		dataDB = new RepositoryDatabase(repoProperty, Path.of(repoProperty.getDbName()), this, inMemory);
 		dataDB.initialize();
 		
-		Set<Path> foundFiles = gitRepo.getFiles(s -> s.toLowerCase().endsWith(".md"), UNTRACKED, MODIFIED, ADDED);
-		
-		checkFileChanges(foundFiles);
-		
-		log.info("Scheduling check for changes in '{}'", repoProperty.getId());
-		executorService.scheduleAtFixedRate(() -> {
-			try{
-				log.info("Update task for repo '{}'", repoProperty.getId());
-				checkFileChanges(gitRepo.getFiles(s -> s.toLowerCase().endsWith(".md"), UNTRACKED, MODIFIED, ADDED));
-			} catch(GitAPIException | CoreException | InvalidUserException | ReadOnlyRepoException e){
-				log.error("Error while checking for changes", e);
+		gitRepo = new GitRepo(repoProperty, inMemory);
+		if(!inMemory){
+			Optional<Path> file = gitRepo.getSingleFile(s -> s.equalsIgnoreCase(repoProperty.getDbName()), UNTRACKED, MODIFIED, ADDED);
+			if(file.isEmpty()){
+				log.info("No Database in '{}'. Creating new Database.", repoProperty.getDbName());
 			}
-		}, 10, checkInterval.toMinutes(), TimeUnit.MINUTES);
+			
+			Set<Path> foundFiles = gitRepo.getFiles(s -> s.toLowerCase().endsWith(".md"), UNTRACKED, MODIFIED, ADDED);
+			
+			checkFileChanges(foundFiles);
+			
+			log.info("Scheduling check for changes in '{}'", repoProperty.getId());
+			executorService.scheduleAtFixedRate(() -> {
+				try{
+					log.info("Update task for repo '{}'", repoProperty.getId());
+					checkFileChanges(gitRepo.getFiles(s -> s.toLowerCase().endsWith(".md"), UNTRACKED, MODIFIED, ADDED));
+				} catch(GitAPIException | CoreException | InvalidUserException | ReadOnlyRepoException e){
+					log.error("Error while checking for changes", e);
+				}
+			}, 10, checkInterval.toMinutes(), TimeUnit.MINUTES);
+		}
 		
 	}
 	
@@ -203,6 +205,11 @@ public class FileRepository implements AutoCloseable{
 	 * @param resource the resource to add
 	 */
 	public void addResourceAndCommit(Resource resource) {
+		
+		if(gitRepo.isMemory()){
+			return;
+		}
+		
 		try{
 			UserBranch branch = gitRepo.createBranch(UserId.of(resource.createdBy()));
 			Path file = gitRepo.getRepoPath().resolve(resource.resourcePath());
@@ -228,6 +235,10 @@ public class FileRepository implements AutoCloseable{
 	 * @param resourcePath the path to the resource
 	 */
 	public void removeResourceAndCommit(UserId userId, Path resourcePath) throws IOException {
+		
+		if(gitRepo.isMemory()){
+			return;
+		}
 		try{
 			UserBranch branch = gitRepo.createBranch(userId);
 			Files.deleteIfExists(getGitRepo().getRepoPath().resolve(resourcePath));
@@ -245,6 +256,10 @@ public class FileRepository implements AutoCloseable{
 	 * @param newFiles the files to add
 	 */
 	private void addNewFiles(List<Path> newFiles) throws CoreSqlException, ReadOnlyRepoException {
+		
+		if(gitRepo.isMemory()){
+			return;
+		}
 		List<Resource> resources = new ArrayList<>();
 		for(Path file : newFiles){
 			RevCommit lastCommitDetailsForFile = gitRepo.getLastCommitDetailsForFile(file.toString());
@@ -276,6 +291,10 @@ public class FileRepository implements AutoCloseable{
 	 */
 	private int updateMatchingResources(List<Path> matchingResources, Map<Path, Resource> existingResources)
 			throws CoreSqlException, ReadOnlyRepoException {
+		
+		if(gitRepo.isMemory()){
+			return 0;
+		}
 		List<Resource> resources = new ArrayList<>();
 		for(Path file : matchingResources){
 			RevCommit fileCommit = gitRepo.getLastCommitDetailsForFile(file.toString());
@@ -336,6 +355,10 @@ public class FileRepository implements AutoCloseable{
 	 * @throws CoreSqlException if there is an error with the core
 	 */
 	private void deleteOldResources(List<Path> deletedResources) throws CoreSqlException, ReadOnlyRepoException {
+		
+		if(gitRepo.isMemory()){
+			return;
+		}
 		for(Path file : deletedResources){
 			log.info("Deleting resource '{}'", file);
 			gitRepo.remove(file);
@@ -353,6 +376,10 @@ public class FileRepository implements AutoCloseable{
 	
 	@Override
 	public void close() throws Exception {
+		
+		if(gitRepo.isMemory()){
+			return;
+		}
 		gitRepo.getGit().close();
 		dataDB.close();
 		
