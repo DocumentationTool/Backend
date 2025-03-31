@@ -77,6 +77,17 @@ public class DatabaseFunctions {
                     """);
 
             statement.execute("""
+                    CREATE TABLE IF NOT EXISTS PathTags(
+                        tag_id TEXT NOT NULL,
+                        target_path TEXT NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        created_by TEXT,
+                        PRIMARY KEY (tag_id,target_path),
+                        FOREIGN KEY (tag_id) REFERENCES Tags(tag_id)
+                    )
+                    """);
+
+            statement.execute("""
                     CREATE TABLE IF NOT EXISTS GroupPermissions(
                         group_id TEXT NOT NULL,
                         path TEXT NOT NULL,

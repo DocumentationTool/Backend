@@ -4,6 +4,7 @@ import com.wonkglorg.doc.core.exception.CoreException;
 import com.wonkglorg.doc.core.exception.CoreSqlException;
 import com.wonkglorg.doc.core.exception.client.*;
 import com.wonkglorg.doc.core.objects.*;
+import com.wonkglorg.doc.core.path.TargetPath;
 import com.wonkglorg.doc.core.request.ResourceRequest;
 import com.wonkglorg.doc.core.request.ResourceUpdateRequest;
 
@@ -144,4 +145,38 @@ public interface ResourceCalls {
      * @param path The path object
      */
     void removeCurrentlyEdited(RepoId id, Path path) throws InvalidResourceException, InvalidRepoException;
+
+
+    //-------------------- Tags --------------------
+
+    /**
+     * Add a tag to a target, this may be a resource or a path
+     * @param repoId the repoId
+     * @param path the path to the target
+     * @param tagId the tagId to add
+     * @throws CoreException
+     * @throws ClientException
+     */
+    void addTag(RepoId repoId, TargetPath path, TagId tagId) throws CoreException, ClientException;
+
+
+    /**
+     * Remove a tag from a target, this may be a resource or a path
+     * @param repoId  the repoId
+     * @param path the path to the target
+     * @param tagId the tagId to remove
+     * @throws CoreException
+     * @throws ClientException
+     */
+    void removeTag(RepoId repoId, TargetPath path, TagId tagId) throws CoreException, ClientException;
+
+    /**
+     * Check if a tag exists on a target, this may be a resource or a path
+     * @param repoId the repoId
+     * @param path the path to the target
+     * @param tagId the tagId to check
+     * @return true if the tag exists false otherwise
+     * @throws CoreException if the tag path does not exist
+     */
+    boolean tagPathExists(RepoId repoId, TargetPath path, TagId tagId) throws CoreException, ClientException;
 }

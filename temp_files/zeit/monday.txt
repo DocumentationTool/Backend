@@ -23,3 +23,8 @@ Finished REST endpoints and fixed some rest related bugs
 
 23:00-0:20
 Setting up jenkins deployment pipeline, setting up linux server
+
+
+21.03.2025
+12:20 - 15:50
+Testing Jenkins deployment pipeline, fixing jenkins bugs, writing integration tests and fixed bugs found by Feldiner

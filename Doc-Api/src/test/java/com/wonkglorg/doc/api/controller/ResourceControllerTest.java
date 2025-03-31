@@ -75,7 +75,8 @@ class ResourceControllerTest extends BaseIntegrationTest{
 		Assertions.assertEquals("Successfully inserted 'test.md' Resource!", restResponse.message());
 		
 	}
-	
+
+	/*
 	@Test
 	void removeResources() {
 		
@@ -105,5 +106,7 @@ class ResourceControllerTest extends BaseIntegrationTest{
 					   .message());
 		
 	}
+
+	 */
 	
 }

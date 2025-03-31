@@ -8,6 +8,7 @@ import com.wonkglorg.doc.core.exception.client.ClientException;
 import com.wonkglorg.doc.core.exception.client.ReadOnlyRepoException;
 import com.wonkglorg.doc.core.interfaces.ResourceCalls;
 import com.wonkglorg.doc.core.objects.*;
+import com.wonkglorg.doc.core.path.TargetPath;
 import com.wonkglorg.doc.core.request.ResourceRequest;
 import com.wonkglorg.doc.core.request.ResourceUpdateRequest;
 import org.slf4j.Logger;
@@ -41,6 +42,12 @@ public class ResourceFunctions implements IDBFunctions, ResourceCalls {
      * The cache of resources for this database
      */
     private final Map<Path, Resource> resourceCache = new java.util.concurrent.ConcurrentHashMap<>();
+
+    /**
+     * The cache of tags for this database
+     */
+    private final Map<TargetPath, TagId> tagPathCache = new HashMap<>();
+
     /**
      * The cache of tags for this database
      */
@@ -154,17 +161,8 @@ public class ResourceFunctions implements IDBFunctions, ResourceCalls {
      * @return the resource
      * @throws SQLException if an error occurs while fetching the resource
      */
-    private static Resource resourceFromResultSet(ResultSet resultSet, Set<TagId> tags, String data, RepositoryDatabase database)
-            throws SQLException {
-        return new Resource(Path.of(resultSet.getString("resource_path")),
-                DateHelper.parseDateTime(resultSet.getString("created_at")),
-                resultSet.getString("created_by"),
-                DateHelper.parseDateTime(resultSet.getString("last_modified_at")),
-                resultSet.getString("last_modified_by"),
-                database.getRepoProperties().getId(),
-                new HashSet<>(tags),
-                resultSet.getString("category"),
-                data);
+    private static Resource resourceFromResultSet(ResultSet resultSet, Set<TagId> tags, String data, RepositoryDatabase database) throws SQLException {
+        return new Resource(Path.of(resultSet.getString("resource_path")), DateHelper.parseDateTime(resultSet.getString("created_at")), resultSet.getString("created_by"), DateHelper.parseDateTime(resultSet.getString("last_modified_at")), resultSet.getString("last_modified_by"), database.getRepoProperties().getId(), new HashSet<>(tags), resultSet.getString("category"), data);
     }
 
     /**
@@ -394,8 +392,7 @@ public class ResourceFunctions implements IDBFunctions, ResourceCalls {
         Connection connection = database.getConnection();
         try {
             int affectedRows = 0;
-            try (var statement = connection.prepareStatement(
-                    "INSERT INTO Resources(resource_path, created_at, created_by, last_modified_at, last_modified_by,category)VALUES(?, ?, ?, ?, ?, ?)")) {
+            try (var statement = connection.prepareStatement("INSERT INTO Resources(resource_path, created_at, created_by, last_modified_at, last_modified_by,category)VALUES(?, ?, ?, ?, ?, ?)")) {
                 connection.setAutoCommit(false);
                 for (var resource : resources) {
                     statement.setString(1, resource.resourcePath().toString());
@@ -446,9 +443,7 @@ public class ResourceFunctions implements IDBFunctions, ResourceCalls {
         Connection connection = database.getConnection();
         try {
             int affectedRows = 0;
-            try (var statement = connection.prepareStatement("UPDATE Resources " +
-                    "SET last_modified_at = ?, last_modified_by = ?, category = ?" +
-                    "WHERE resource_path = ?")) {
+            try (var statement = connection.prepareStatement("UPDATE Resources " + "SET last_modified_at = ?, last_modified_by = ?, category = ?" + "WHERE resource_path = ?")) {
 
                 connection.setAutoCommit(false);
                 for (var resource : resources) {
@@ -462,8 +457,7 @@ public class ResourceFunctions implements IDBFunctions, ResourceCalls {
             }
 
             //deleting and reinserting the filedata
-            try (var deleteStatement = connection.prepareStatement("DELETE FROM FileData WHERE resource_path = ?");
-                 var insertStatement = connection.prepareStatement("INSERT INTO FileData(resource_path, data) VALUES(?, ?)")) {
+            try (var deleteStatement = connection.prepareStatement("DELETE FROM FileData WHERE resource_path = ?"); var insertStatement = connection.prepareStatement("INSERT INTO FileData(resource_path, data) VALUES(?, ?)")) {
 
                 for (var resource : resources) {
                     if (resource.data() == null) {
@@ -559,20 +553,38 @@ public class ResourceFunctions implements IDBFunctions, ResourceCalls {
 
         // Apply path filtering only if necessary
         if (request.targetPath().isPresent()) {
-            resources = resources.entrySet().stream().filter(entry -> pathMatcher.match(request.getPath(), entry.getKey().toString())).collect(
-                    Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            resources = resources.entrySet().stream().filter(entry -> pathMatcher.match(request.getPath(), entry.getKey().toString())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         }
 
-        resources = resources.entrySet()
-                .stream()
-                .filter(entry -> request.whiteListTags() == null ||
-                        request.whiteListTags().isEmpty() ||
-                        entry.getValue().hasAnyTagId(request.whiteListTags()))
-                .filter(entry -> request.blacklistTags() == null ||
-                        request.blacklistTags().isEmpty() ||
-                        !entry.getValue().hasAnyTagId(request.blacklistTags()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        return resources.values().stream().limit(request.getReturnLimit()).collect(Collectors.toList());
+        resources = resources.entrySet().stream().filter(entry -> request.whiteListTags() == null || request.whiteListTags().isEmpty() || entry.getValue().hasAnyTagId(request.whiteListTags())).filter(entry -> request.blacklistTags() == null || request.blacklistTags().isEmpty() || !entry.getValue().hasAnyTagId(request.blacklistTags())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        List<Resource> collect = resources.values().stream().limit(request.getReturnLimit()).map(Resource::copy).collect(Collectors.toList());
+
+
+
+        for (Resource resource : collect) {
+            Set<TagId> additionalTagsToAdd = tagsForPath(TargetPath.of(resource.resourcePath()), tagPathCache);
+        }
+
+
+        return collect;
+    }
+
+
+    /**
+     * Resolves all tags applied to directories based on the path
+     *
+     * @param path         the path to resolve
+     * @param tagPathCache the tag path cache
+     * @return a set of tags
+     */
+    public static Set<TagId> tagsForPath(TargetPath path, Map<TargetPath, TagId> tagPathCache) {
+        Set<TagId> tags = new HashSet<>();
+        for (Map.Entry<TargetPath, TagId> entry : tagPathCache.entrySet()) {
+            if (pathMatcher.match(entry.getKey().toString(), path.toString())) {
+                tags.add(entry.getValue());
+            }
+        }
+        return tags;
     }
 
     @Override
@@ -707,9 +719,7 @@ public class ResourceFunctions implements IDBFunctions, ResourceCalls {
                 }
             }
 
-            try (var statement = connection.prepareStatement("UPDATE Resources " +
-                    "SET last_modified_at = ?, last_modified_by = ?" +
-                    "WHERE resource_path = ?")) {
+            try (var statement = connection.prepareStatement("UPDATE Resources " + "SET last_modified_at = ?, last_modified_by = ?" + "WHERE resource_path = ?")) {
                 statement.setString(1, DateHelper.fromDateTime(LocalDateTime.now()));
                 statement.setString(2, request.userId().id());
                 statement.setString(3, request.path().toString());
@@ -876,6 +886,91 @@ public class ResourceFunctions implements IDBFunctions, ResourceCalls {
     @Override
     public void removeCurrentlyEdited(RepoId id, Path path) {
         currentlyEdited.values().removeIf(p -> p.equals(path));
+    }
+
+    @Override
+    public void addTag(RepoId repoId, TargetPath path, TagId tagId) throws CoreException, ClientException {
+        if (!path.isPresent()) {
+            throw new ClientException("Path cannot be null");
+        }
+
+
+        if (tagPathExists(repoId, path, tagId)) {
+            throw new ClientException("Tag '%s' already exists for target '%s'".formatted(tagId.id(), path));
+        }
+
+        if (path.isAntPath()) {
+
+            try (PreparedStatement statement = database.getConnection().prepareStatement("INSERT INTO PathTags(path, tag_id) VALUES(?, ?)")) {
+                statement.setString(1, path.toString());
+                statement.setString(2, tagId.id());
+                statement.executeUpdate();
+                tagPathCache.put(path, tagId);
+            } catch (Exception e) {
+                throw new CoreSqlException("Failed to add tag to path", e);
+            }
+
+        } else {
+            try (PreparedStatement statement = database.getConnection().prepareStatement("INSERT INTO ResourceTags(resource_path, tag_id) VALUES(?, ?)")) {
+                statement.setString(1, path.toString());
+                statement.setString(2, tagId.id());
+                statement.executeUpdate();
+                Resource resource = resourceCache.get(path.getPath());
+                if (resource != null) {
+                    resource.getResourceTags().add(tagId);
+                }
+            } catch (SQLException e) {
+                throw new CoreSqlException("Failed to add tag to path", e);
+            }
+        }
+    }
+
+    @Override
+    public void removeTag(RepoId repoId, TargetPath path, TagId tagId) throws CoreException, ClientException {
+        if (!path.isPresent()) {
+            throw new ClientException("Path cannot be null");
+        }
+
+        if (!tagPathExists(repoId, path, tagId)) {
+            throw new ClientException("Tag '%s' does not exist for target '%s'".formatted(tagId.id(), path));
+        }
+
+        if (path.isAntPath()) {
+            try (var statement = database.getConnection().prepareStatement("DELETE FROM PathTags WHERE path = ? AND tag_id = ?")) {
+                statement.setString(1, path.toString());
+                statement.setString(2, tagId.id());
+                statement.executeUpdate();
+            } catch (SQLException e) {
+                throw new CoreSqlException("Failed to remove tag from path", e);
+
+            }
+            tagPathCache.remove(path);
+        } else {
+            try (var statement = database.getConnection().prepareStatement("DELETE FROM ResourceTags WHERE resource_path = ? AND tag_id = ?")) {
+                statement.setString(1, path.toString());
+                statement.setString(2, tagId.id());
+                statement.executeUpdate();
+            } catch (SQLException e) {
+                throw new CoreSqlException("Failed to remove tag from path", e);
+            }
+            Resource resource = resourceCache.get(path.getPath());
+            if (resource != null) {
+                resource.getResourceTags().remove(tagId);
+            }
+        }
+    }
+
+    @Override
+    public boolean tagPathExists(RepoId repoId, TargetPath path, TagId tagId) throws CoreException, ClientException {
+        if (!path.isPresent()) {
+            throw new ClientException("Path cannot be null");
+        }
+        if (path.isAntPath()) {
+            return tagPathCache.get(path).equals(tagId);
+        } else {
+            Resource resource = resourceCache.get(path.getPath());
+            return resource != null && resource.getResourceTags().contains(tagId);
+        }
     }
 
     @Override
