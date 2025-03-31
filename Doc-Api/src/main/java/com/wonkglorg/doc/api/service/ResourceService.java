@@ -18,6 +18,8 @@ import com.wonkglorg.doc.core.objects.Tag;
 import com.wonkglorg.doc.core.objects.TagId;
 import com.wonkglorg.doc.core.objects.UserId;
 import static com.wonkglorg.doc.core.path.TargetPath.normalizePath;
+
+import com.wonkglorg.doc.core.path.TargetPath;
 import com.wonkglorg.doc.core.request.ResourceRequest;
 import com.wonkglorg.doc.core.request.ResourceUpdateRequest;
 import org.slf4j.Logger;
@@ -427,7 +429,22 @@ public class ResourceService implements ResourceCalls{
 		}
 		repoService.getRepo(id).getDatabase().resourceFunctions().removeCurrentlyEdited(id, path);
 	}
-	
+
+	@Override
+	public void addTag(RepoId repoId, TargetPath path, TagId tagId) throws CoreException, ClientException {
+
+	}
+
+	@Override
+	public void removeTag(RepoId repoId, TargetPath path, TagId tagId) throws CoreException, ClientException {
+
+	}
+
+	@Override
+	public boolean tagPathExists(RepoId repoId, TargetPath path, TagId tagId) throws CoreException, ClientException {
+		return false;
+	}
+
 	@Override
 	public void createTag(RepoId repoId, Tag tag) throws ClientException, CoreSqlException {
 		repoService.validateRepoId(repoId);
