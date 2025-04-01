@@ -5,6 +5,8 @@ doc:
       crossOrigin:
         - origin: "http://localhost:8080"
           path: "/**"
+        - origin: "http://5.75.149.191"
+          path: "/**"
         - origin: "http://localhost:4200"
           path: "/**"
       whitelist:
