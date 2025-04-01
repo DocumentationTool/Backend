@@ -4,6 +4,7 @@ import com.wonkglorg.doc.api.properties.ApiProperties;
 import com.wonkglorg.doc.api.security.filters.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -42,12 +43,9 @@ public class SecurityConfig{
 	public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authManager) throws Exception {
 		http.csrf(AbstractHttpConfigurer::disable)
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-			.authorizeHttpRequests(auth -> auth.requestMatchers(apiProperties.getWhitelist().toArray(new String[0]))
-											   .permitAll()
-											   .anyRequest()
-											   .authenticated())
-			.exceptionHandling(e -> e.authenticationEntryPoint(new UserAuthenticationEntryPoint()))
-			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+			.authorizeHttpRequests(auth -> auth.requestMatchers("/**").permitAll())  // Allow all paths
+			.authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()) // Allow OPTIONS method for all paths
+			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Add JWT filter
 		return http.build();
 	}
 	
