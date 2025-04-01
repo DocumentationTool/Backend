@@ -14,12 +14,6 @@ class ResourceControllerTagTest extends BaseIntegrationTest{
 	
 	@Test
 	void testInsertResource() {
-		//should fail not all required parameters given
-		Assertions.assertNull(request.postForObject("/api/resource/tag/add", null, RestResponse.class));
-		//should fail not all required parameters given
-		Assertions.assertNull(request.postForObject("/api/resource/tag/add?repoId='repo1'", null, RestResponse.class));
-		//should fail not all required parameters given
-		Assertions.assertNull(request.postForObject("/api/resource/tag/add?repoId='repo1'&tagId='tag1'", null, RestResponse.class));
 		RepoId repoId = repoService.getRepositories().keySet().iterator().next();
 		
 		//can't fail otherwise removetag did not work

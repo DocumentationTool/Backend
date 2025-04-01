@@ -4,6 +4,7 @@ import com.wonkglorg.doc.api.properties.ApiProperties;
 import com.wonkglorg.doc.api.security.filters.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
@@ -43,22 +44,34 @@ public class SecurityConfig{
 	public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authManager) throws Exception {
 		http.csrf(AbstractHttpConfigurer::disable)
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-			.authorizeHttpRequests(auth -> auth.requestMatchers("/**").permitAll())  // Allow all paths
+			.authorizeHttpRequests(auth -> auth.requestMatchers("/**").permitAll())  // allow all paths
 			.authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()) // Allow OPTIONS method for all paths
-			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Add JWT filter
+			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // add JWT filter
 		return http.build();
 	}
 	
+	@Profile("prod")
 	@Bean
 	public WebMvcConfigurer corsConfigurer() {
 		return new WebMvcConfigurer(){
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/**")// All endpoints
-						.allowedOrigins("https://www.markdoc.net", "http://localhost:4200") // allowed origins
+						.allowedOriginPatterns("https://www.markdoc.net", "http://localhost:*")//localhost:8080") // allowed origins
 						.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // options specifically to allow cors
 						.allowedHeaders("*") //all headers
 						.allowCredentials(true); // cookies and credentials
+			}
+		};
+	}
+	
+	@Profile({"test", "deployment"})
+	@Bean
+	public WebMvcConfigurer testCorsConfig() {
+		return new WebMvcConfigurer(){
+			@Override
+			public void addCorsMappings(CorsRegistry registry) {
+				registry.addMapping("/**").allowedOriginPatterns("http://localhost:*").allowedMethods("*").allowedHeaders("*").allowCredentials(true);
 			}
 		};
 	}
