@@ -196,7 +196,10 @@ public class UserDatabase extends Database<HikariDataSource> implements UserCall
 	private static HikariDataSource getDataSource(Path openInPath) throws IOException {
 		HikariConfig hikariConfig = new HikariConfig();
 		hikariConfig.setLeakDetectionThreshold(1000);
-		Files.createDirectories(openInPath.getParent());
+		Path parent = openInPath.getParent();
+		if(parent != null){
+			Files.createDirectories(parent);
+		}
 		hikariConfig.setJdbcUrl(SQLITE.driver() + openInPath.toString());
 		hikariConfig.setDriverClassName(SQLITE.classLoader());
 		return new HikariDataSource(hikariConfig);
