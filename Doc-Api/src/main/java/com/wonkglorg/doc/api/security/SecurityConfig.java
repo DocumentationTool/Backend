@@ -56,22 +56,13 @@ public class SecurityConfig{
 		return new WebMvcConfigurer(){
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-				// If you want to use the dynamic configuration from apiProperties, uncomment the following
-                /*
-                for (var origin : apiProperties.getCrossOrigin()) {
-                    registry.addMapping(origin.getPath())
-                            .allowedMethods(origin.getAllowedMethods().toArray(new String[0]))
-                            .allowedHeaders(origin.getAllowedHeaders().toArray(new String[0]))
-                            .allowedOrigins(origin.getOrigin());
-                }
-                */
-				
-				// Default configuration
-				registry.addMapping("/**").allowedOrigins("https://www.markdoc.net") // Set your actual origin here
-						.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Allowed HTTP methods
-						.allowedHeaders("*") // Allow all headers
-						.allowCredentials(true); // If sending cookies with requests
+				registry.addMapping("/**")// All endpoints
+						.allowedOrigins("https://www.markdoc.net", "http://localhost:4200") // allowed origins
+						.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // options specifically to allow cors
+						.allowedHeaders("*") //all headers
+						.allowCredentials(true); // cookies and credentials
 			}
 		};
 	}
+	
 }
