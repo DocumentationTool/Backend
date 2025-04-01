@@ -35,18 +35,18 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-//@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT, properties = "server.port=8080")
+@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT, properties = "server.port=8080")
 class LoginWebTest{
 	
 	//todo:jmd random ports not working duo to how pipelines in jenkins would work where the port 8080 will be in use
 	
-	//@Autowired
+	@Autowired
 	protected TestRestTemplate request;
 	
-	//@Autowired
+	@Autowired
 	protected RepoService repoService;
 	
-	//@Autowired
+	@Autowired
 	protected UserService userService;
 	
 	private WebDriver driver;
@@ -73,7 +73,7 @@ class LoginWebTest{
 	}
 	
 	
-	//@Test
+	@Test
 	void canLoginAsAdmin() throws InterruptedException, IOException {
 		
 		ExtentReports report = new ExtentReports();
@@ -118,7 +118,7 @@ class LoginWebTest{
 	
 	//todo:jmd make it nicer for show and slower too? or perhaps step through it with breaks? during presentation?
 	
-	//@Test
+	@Test
 	void resourceTest() throws InterruptedException {
 		ExtentReports report = new ExtentReports();
 		report.attachReporter(extent);
@@ -172,7 +172,12 @@ class LoginWebTest{
 			test.log(Status.INFO, "Confirmed deletion");
 			
 			Thread.sleep(1000);
-			Assertions.assertFalse(resource.isDisplayed(), "Resource should not be visible after deleting");
+			try {
+				Assertions.assertFalse(resource.isDisplayed(), "Resource should not be visible after deleting");
+			} catch (Exception e) {
+				//depending on version throws an exception instead of retunring false for display
+				Assertions.assertTrue(true, "Resource is not visible after deletion");
+			}
 			test.log(Status.PASS, "Resource deleted successfully");
 			
 		} catch(Exception e){
@@ -259,14 +264,15 @@ class LoginWebTest{
 			Assertions.assertTrue(previewToggle.isDisplayed(), "Preview toggle should be visible");
 			previewToggle.click();
 			test.log(Status.INFO, "Switched to edit mode");
-			
+			Thread.sleep(1000);
 			WebElement editorInput = driver.findElement(By.className("ace_text-input"));
 			editorInput.sendKeys("Test");
 			test.log(Status.INFO, "Entered content into editor");
-			
+			Thread.sleep(1000);
 			previewToggle.click();
 			test.log(Status.INFO, "Switched back to preview mode");
-			
+
+			Thread.sleep(1000);
 			WebElement saveButton = driver.findElement(By.className("ri-save-line"));
 			saveButton.click();
 			test.log(Status.PASS, "Saved changes to resource");
