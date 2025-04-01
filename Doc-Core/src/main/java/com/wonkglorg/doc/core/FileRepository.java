@@ -102,7 +102,7 @@ public class FileRepository implements AutoCloseable{
 	public void initialize() throws GitAPIException, CoreException, InvalidUserException, ReadOnlyRepoException {
 		log.info("Looking for repo in: '{}'", repoProperty.getPath());
 		
-		dataDB = new RepositoryDatabase(repoProperty, Path.of(repoProperty.getDbName()), this, inMemory);
+		dataDB = new RepositoryDatabase(repoProperty, repoProperty.getPath().resolve(repoProperty.getDbName()), this, inMemory);
 		dataDB.initialize();
 		
 		gitRepo = new GitRepo(repoProperty, inMemory);

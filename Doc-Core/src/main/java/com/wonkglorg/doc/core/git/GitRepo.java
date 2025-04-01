@@ -403,7 +403,7 @@ public class GitRepo{
 	 */
 	private HashSet<Path> get(Predicate<String> filter, boolean quitSingle, GitStage... stages) throws GitAPIException {
 		HashSet<Path> files = new HashSet<>();
-		Status status = git.status().call();
+		Status status = git.status().	call();
 		Set<String> allFiles = new HashSet<>();
 		for(GitStage stage : stages){
 			allFiles.addAll(stage.getFiles(status));

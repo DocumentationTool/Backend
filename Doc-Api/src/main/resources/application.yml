@@ -11,6 +11,7 @@ doc:
           path: "/**"
       whitelist:
         #endpoints for swagger reverse proxy
+        - /auth/**
         - /v3/api-docs/**
         - /swagger-ui/**
         - /swagger-ui.html
@@ -46,19 +47,8 @@ doc:
         path: temp/git/java
       - id: "cobol-docs"
         path: temp/git/cobol
-spring:
-  config:
-    activate:
-      on-profile: prod
-
----
-doc:
-  git:
-    repositories:
-      - id: "java-docs"
-        path: temp/git/java
-      - id: "cobol-docs"
-        path: temp/git/cobol
+      - id: "project-docs"
+        path: temp/git/project
 spring:
   config:
     activate:

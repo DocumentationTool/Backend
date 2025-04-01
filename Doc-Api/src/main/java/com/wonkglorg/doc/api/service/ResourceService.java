@@ -305,7 +305,7 @@ public class ResourceService implements ResourceCalls{
 		}
 		
 		if(isBeingEdited(id, path)){
-			throw new CoreSqlException("Resource '%s' in '%s' is currently being edited and cannot be updated!".formatted(normalizePath(path.toString()),
+			throw new ClientException("Resource '%s' in '%s' is currently being edited and cannot be updated!".formatted(normalizePath(path.toString()),
 					id));
 		}
 		
