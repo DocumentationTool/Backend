@@ -17,7 +17,7 @@ public class DocApiApplication extends SpringBootServletInitializer{ //extend Sp
 	/**
 	 * Bypasses permissions and allows full access to all endpoints (only if true)
 	 */
-	public static boolean DEV_MODE = false;
+	public static boolean DEV_MODE = true;
 	
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
