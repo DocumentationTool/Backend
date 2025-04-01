@@ -15,9 +15,9 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableCaching
 public class DocApiApplication extends SpringBootServletInitializer{ //extend SpringBootServletInitializer to allow for deployment to a servlet container
 	/**
-	 * Bypasses permissions and allows full access to all endpoints
+	 * Bypasses permissions and allows full access to all endpoints (only if true)
 	 */
-	public static final boolean DEV_MODE = false;
+	public static boolean DEV_MODE = false;
 	
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
