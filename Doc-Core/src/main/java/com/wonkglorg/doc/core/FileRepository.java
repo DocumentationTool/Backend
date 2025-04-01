@@ -81,7 +81,7 @@ public class FileRepository implements AutoCloseable{
 			if(userDB == null){
 				userDB = new UserDatabase(inMemory ? null : Path.of("users.db"));
 			}
-		} catch(SQLException e){
+		} catch(SQLException | IOException e){
 			throw new RuntimeException(e);
 		}
 	}
@@ -99,7 +99,7 @@ public class FileRepository implements AutoCloseable{
 	 *
 	 * @throws GitAPIException if there is an error with the git repo
 	 */
-	public void initialize() throws GitAPIException, CoreException, InvalidUserException, ReadOnlyRepoException {
+	public void initialize() throws GitAPIException, CoreException, InvalidUserException, ReadOnlyRepoException, IOException {
 		log.info("Looking for repo in: '{}'", repoProperty.getPath());
 		
 		dataDB = new RepositoryDatabase(repoProperty, repoProperty.getPath().resolve(repoProperty.getDbName()), this, inMemory);

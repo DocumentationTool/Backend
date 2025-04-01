@@ -16,6 +16,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +56,7 @@ public class RepoService{
 			repositories.put(repoProperty.getId(), repository);
 			try{
 				repository.initialize();
-			} catch(GitAPIException | CoreException | InvalidUserException | ReadOnlyRepoException e){
+			} catch(GitAPIException | CoreException | InvalidUserException | ReadOnlyRepoException | IOException e){
 				log.error("Failed to initialize repository '{}'", repoProperty.getId(), e);
 			}
 		}

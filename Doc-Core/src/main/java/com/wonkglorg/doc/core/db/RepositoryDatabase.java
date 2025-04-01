@@ -15,6 +15,8 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -41,7 +43,7 @@ public class RepositoryDatabase extends Database<HikariDataSource>{
 	 */
 	private final RepoProperty repoProperties;
 	
-	public RepositoryDatabase(RepoProperty repoProperties, Path openInPath, FileRepository fileRepository, boolean inMemory) {
+	public RepositoryDatabase(RepoProperty repoProperties, Path openInPath, FileRepository fileRepository, boolean inMemory) throws IOException {
 		super(inMemory ? MEMORY_SQLITE : SQLITE, inMemory ? getMemoryDataSource() : getDataSource(openInPath));
 		if(inMemory){
 			log.info("Using in memory database for repo '{}'", repoProperties.getId());
@@ -61,10 +63,11 @@ public class RepositoryDatabase extends Database<HikariDataSource>{
 	 * @param openInPath the path to open the data source in
 	 * @return the created data source
 	 */
-	private static HikariDataSource getDataSource(Path openInPath) {
+	private static HikariDataSource getDataSource(Path openInPath) throws IOException {
 		HikariConfig hikariConfig = new HikariConfig();
 		hikariConfig.setLeakDetectionThreshold(1000);
-		hikariConfig.setJdbcUrl(SQLITE.driver() + openInPath.toString());
+		Files.createDirectories(openInPath.getParent());
+		hikariConfig.setJdbcUrl(SQLITE.driver() + openInPath);
 		hikariConfig.setDriverClassName(SQLITE.classLoader());
 		return new HikariDataSource(hikariConfig);
 	}

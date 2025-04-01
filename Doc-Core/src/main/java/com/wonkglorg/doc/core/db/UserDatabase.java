@@ -20,6 +20,8 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -60,7 +62,7 @@ public class UserDatabase extends Database<HikariDataSource> implements UserCall
 	 * @param path the path to the database
 	 * @throws SQLException
 	 */
-	public UserDatabase(Path path) throws SQLException {
+	public UserDatabase(Path path) throws SQLException, IOException {
 		super(path == null ? MEMORY_SQLITE : SQLITE, path == null ? getMemoryDataSource() : getDataSource(path));
 		
 		if(path != null){
@@ -191,9 +193,10 @@ public class UserDatabase extends Database<HikariDataSource> implements UserCall
 	 * @param openInPath the path to open the data source in
 	 * @return the created data source
 	 */
-	private static HikariDataSource getDataSource(Path openInPath) {
+	private static HikariDataSource getDataSource(Path openInPath) throws IOException {
 		HikariConfig hikariConfig = new HikariConfig();
 		hikariConfig.setLeakDetectionThreshold(1000);
+		Files.createDirectories(openInPath.getParent());
 		hikariConfig.setJdbcUrl(SQLITE.driver() + openInPath.toString());
 		hikariConfig.setDriverClassName(SQLITE.classLoader());
 		return new HikariDataSource(hikariConfig);
