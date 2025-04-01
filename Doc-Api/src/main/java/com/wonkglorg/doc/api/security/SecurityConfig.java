@@ -15,8 +15,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * Security configuration for the application.
@@ -63,8 +61,11 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authManager) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable)  //disables cross-site request forgery since JWT is
+        http
+                .cors(AbstractHttpConfigurer::disable) //disabled for now to make work for project
+                .csrf(AbstractHttpConfigurer::disable)  //disables cross-site request forgery since JWT is
                 // stateless
+
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //no session management we use jwt
                 .authorizeHttpRequests(auth -> auth.requestMatchers(apiProperties.getWhitelist().toArray(new String[0]))
                         .permitAll()
@@ -81,6 +82,7 @@ public class SecurityConfig {
      *
      * @return the cors configuration
      */
+    /*
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
@@ -95,5 +97,8 @@ public class SecurityConfig {
             }
         };
     }
+     */
+
+
 }
 
