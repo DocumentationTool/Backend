@@ -23,7 +23,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig {
+public class SecurityConfig{
 	
 	private final ApiProperties apiProperties;
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -43,12 +43,11 @@ public class SecurityConfig {
 	
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authManager) throws Exception {
-		http.csrf(AbstractHttpConfigurer::disable)
-			.cors(Customizer.withDefaults())
-			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-			.authorizeHttpRequests(auth -> auth
-					.requestMatchers("/**").permitAll() // Allow all paths
-					.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()) // Allow OPTIONS method for all paths
+		http.csrf(AbstractHttpConfigurer::disable).cors(Customizer.withDefaults()).sessionManagement(session -> session.sessionCreationPolicy(
+					SessionCreationPolicy.STATELESS)).authorizeHttpRequests(auth -> auth.requestMatchers("/**")
+																						.permitAll() // Allow all paths
+																						.requestMatchers(HttpMethod.OPTIONS, "/**")
+																						.permitAll()) // Allow OPTIONS method for all paths
 			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Add JWT filter
 		
 		return http.build();
@@ -57,7 +56,7 @@ public class SecurityConfig {
 	@Profile("prod")
 	@Bean
 	public WebMvcConfigurer corsConfigurer() {
-		return new WebMvcConfigurer() {
+		return new WebMvcConfigurer(){
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/**") // All endpoints
@@ -72,11 +71,11 @@ public class SecurityConfig {
 	@Profile({"test", "deployment"})
 	@Bean
 	public WebMvcConfigurer testCorsConfig() {
-		return new WebMvcConfigurer() {
+		return new WebMvcConfigurer(){
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**")
-						.allowedOriginPatterns("http://localhost:*") // Allow localhost for testing/deployment
+				registry.addMapping("/**").allowedOriginPatterns("http://localhost:*",
+								"https://www.markdoc.net") // Allow localhost for testing/deployment
 						.allowedMethods("*") // Allow all methods
 						.allowedHeaders("*") // Allow all headers
 						.allowCredentials(true); // Allow credentials for local testing
