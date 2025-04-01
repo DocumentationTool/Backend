@@ -22,7 +22,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig{
+public class SecurityConfig {
 	
 	private final ApiProperties apiProperties;
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -44,23 +44,25 @@ public class SecurityConfig{
 	public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authManager) throws Exception {
 		http.csrf(AbstractHttpConfigurer::disable)
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-			.authorizeHttpRequests(auth -> auth.requestMatchers("/**").permitAll())  // allow all paths
-			.authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()) // Allow OPTIONS method for all paths
-			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // add JWT filter
+			.authorizeHttpRequests(auth -> auth
+					.requestMatchers("/**").permitAll() // Allow all paths
+					.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()) // Allow OPTIONS method for all paths
+			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Add JWT filter
+		
 		return http.build();
 	}
 	
 	@Profile("prod")
 	@Bean
 	public WebMvcConfigurer corsConfigurer() {
-		return new WebMvcConfigurer(){
+		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**")// All endpoints
-						.allowedOriginPatterns("https://www.markdoc.net", "http://localhost:*")//localhost:8080") // allowed origins
-						.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // options specifically to allow cors
-						.allowedHeaders("*") //all headers
-						.allowCredentials(true); // cookies and credentials
+				registry.addMapping("/**") // All endpoints
+						.allowedOriginPatterns("https://www.markdoc.net") // Trusted origins for production
+						.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Allow methods
+						.allowedHeaders("*") // Allow all headers
+						.allowCredentials(true); // Enable credentials for trusted origins
 			}
 		};
 	}
@@ -68,12 +70,15 @@ public class SecurityConfig{
 	@Profile({"test", "deployment"})
 	@Bean
 	public WebMvcConfigurer testCorsConfig() {
-		return new WebMvcConfigurer(){
+		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**").allowedOriginPatterns("http://localhost:*").allowedMethods("*").allowedHeaders("*").allowCredentials(true);
+				registry.addMapping("/**")
+						.allowedOriginPatterns("http://localhost:*") // Allow localhost for testing/deployment
+						.allowedMethods("*") // Allow all methods
+						.allowedHeaders("*") // Allow all headers
+						.allowCredentials(true); // Allow credentials for local testing
 			}
 		};
 	}
-	
 }
