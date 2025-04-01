@@ -6,7 +6,6 @@ import com.aventstack.extentreports.Status;
 import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import com.wonkglorg.doc.api.service.RepoService;
 import com.wonkglorg.doc.api.service.UserService;
-import com.wonkglorg.doc.core.FileRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,50 +26,41 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 import static java.lang.Thread.sleep;
 
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT, properties = "server.port=8080")
+//@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT, properties = "server.port=8080")
 class LoginWebTest {
 
     //todo:jmd random ports not working duo to how pipelines in jenkins would work where the port 8080 will be in use
 
-    @Autowired
+    //@Autowired
     protected TestRestTemplate request;
 
-    @Autowired
+    //@Autowired
     protected RepoService repoService;
 
-    @Autowired
+    //@Autowired
     protected UserService userService;
 
     private WebDriver driver;
 
     private ExtentSparkReporter extent;
-    private static final Set<Path> tempDirs = new HashSet<>();
 
     private static final Path testDir = Path.of("web-tests/reports/%s".formatted(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date())));
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         // Set path to chromedriver if not in system PATH
         // System.setProperty("webdriver.chrome.driver", "path/to/chromedriver");
 
         driver = new ChromeDriver();
         driver.manage().window().maximize();
         extent = new ExtentSparkReporter(testDir.resolve("resource-test.html").toString());
-
-        for (var property : repoService.getRepositories().entrySet()) {
-            FileRepository repository = property.getValue();
-            Path path = repository.getDatabase().getRepoProperties().getPath();
-            tempDirs.add(path);
-        }
     }
 
 
-    @Test
+    //@Test
     void canLoginAsAdmin() throws InterruptedException, IOException {
 
         ExtentReports report = new ExtentReports();
@@ -113,7 +103,7 @@ class LoginWebTest {
         }
     }
 
-    @Test
+    //@Test
     void resourceTest() throws InterruptedException {
         ExtentReports report = new ExtentReports();
         report.attachReporter(extent);
@@ -237,9 +227,13 @@ class LoginWebTest {
             select.selectByIndex(1); // assumes first option is valid
             test.log(Status.INFO, "Selected repo from dropdown");
 
+            captureScreenshot(test, "File Creation Values");
+
             WebElement uploadButton = driver.findElement(By.className("upload-btn"));
             Assertions.assertTrue(uploadButton.isDisplayed(), "Upload button should be visible");
             uploadButton.click();
+            sleep(500);
+            captureScreenshot(test, "File Creation");
             test.log(Status.PASS, "Resource creation submitted");
         } catch (Exception e) {
             test.log(Status.FAIL, "Failed to create resource: " + e.getMessage());
@@ -262,6 +256,10 @@ class LoginWebTest {
             sleep(1000);
             WebElement editorInput = driver.findElement(By.className("ace_text-input"));
             editorInput.sendKeys("Test");
+            //todo:jmd add more things to it like selecting multiple fonts and styles to test them all?
+
+            captureScreenshot(test, "Resource Edit");
+
             test.log(Status.INFO, "Entered content into editor");
             sleep(1000);
             previewToggle.click();
