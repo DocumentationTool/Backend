@@ -16,7 +16,6 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 
 import java.io.File;
@@ -29,18 +28,15 @@ import java.util.Date;
 
 import static java.lang.Thread.sleep;
 
-//@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT, properties = "server.port=8080")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = "server.port=8080")
 class LoginWebTest {
-
-    //todo:jmd random ports not working duo to how pipelines in jenkins would work where the port 8080 will be in use
-
-    //@Autowired
+    @Autowired
     protected TestRestTemplate request;
 
-    //@Autowired
+    @Autowired
     protected RepoService repoService;
 
-    //@Autowired
+    @Autowired
     protected UserService userService;
 
     private WebDriver driver;
@@ -103,7 +99,7 @@ class LoginWebTest {
         }
     }
 
-    //@Test
+    @Test
     void resourceTest() throws InterruptedException {
         ExtentReports report = new ExtentReports();
         report.attachReporter(extent);
