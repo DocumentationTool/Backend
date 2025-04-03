@@ -42,12 +42,16 @@ public class RepositoryDatabase extends Database<HikariDataSource>{
 	 * The properties of the repository
 	 */
 	private final RepoProperty repoProperties;
+
+	private final Path openInPath;
 	
 	public RepositoryDatabase(RepoProperty repoProperties, Path openInPath, FileRepository fileRepository, boolean inMemory) throws IOException {
 		super(inMemory ? MEMORY_SQLITE : SQLITE, inMemory ? getMemoryDataSource() : getDataSource(openInPath));
 		if(inMemory){
+			this.openInPath = Path.of("");
 			log.info("Using in memory database for repo '{}'", repoProperties.getId());
 		} else {
+			this.openInPath = openInPath;
 			log.info("Using database at '{}' for repo '{}'", openInPath, repoProperties.getId());
 		}
 		
@@ -130,5 +134,9 @@ public class RepositoryDatabase extends Database<HikariDataSource>{
 	@Override
 	public void close() throws Exception {
 		getDataSource().close();
+	}
+
+	public Path getOpenInPath() {
+		return openInPath;
 	}
 }

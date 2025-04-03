@@ -34,6 +34,9 @@ public class RepoProperty {
      */
     private Path dbStorage = path;
 
+    private String github;
+    private String token;
+
     public RepoId getId() {
         return id;
     }
@@ -74,4 +77,20 @@ public class RepoProperty {
         this.dbStorage = dbStorage;
     }
 
+
+    public String getGithub() {
+        return github;
+    }
+
+    public void setGithub(String github) {
+        this.github = github;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 }

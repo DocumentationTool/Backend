@@ -47,7 +47,7 @@ public class RepoService{
 	}
 	
 	@PostConstruct
-	public void initialize() {
+	public void initialize() throws GitAPIException, ReadOnlyRepoException {
 		log.info("Initializing RepoService");
 		repositories.clear();
 		for(RepoProperty repoProperty : properties.getRepositories()){

@@ -819,7 +819,7 @@ public class ResourceFunctions implements IDBFunctions, ResourceCalls {
      */
     public void batchInsert(List<Resource> resources) throws CoreSqlException, ReadOnlyRepoException {
         log.info("Batch inserting resources for repo '{}'", database.getRepoId());
-        if (database.getRepoProperties().isReadOnly()) {
+        if (!database.getRepoProperties().isReadOnly()) {
             batchInsertResources(resources);
         }
         resources.forEach(resource -> resourceCache.put(resource.resourcePath(), resource));

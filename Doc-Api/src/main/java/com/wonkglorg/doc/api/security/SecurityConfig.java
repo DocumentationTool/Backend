@@ -70,7 +70,7 @@ public class SecurityConfig {
         };
     }
 
-    @Profile({"test", "deployment"})
+    @Profile({"test", "deployment","dev"})
     @Bean
     public WebMvcConfigurer testCorsConfig() {
         return new WebMvcConfigurer() {
