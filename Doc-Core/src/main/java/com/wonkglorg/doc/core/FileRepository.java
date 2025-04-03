@@ -189,7 +189,11 @@ public class FileRepository implements AutoCloseable {
     }
 
     public Path relativizePathToRepo(Path path) {
-        return gitRepo.getRepoPath().relativize(path);
+        try {
+            return gitRepo.getRepoPath().relativize(path);
+        }catch (Exception e){
+            return path;
+        }
     }
 
     public void addDataDb() {
@@ -236,9 +240,6 @@ public class FileRepository implements AutoCloseable {
         }
 
         try {
-            gitRepo.add(resource.resourcePath());
-            gitRepo.commit("Added resource %s".formatted(resource.resourcePath()));
-            gitRepo.push();
             //UserBranch branch = gitRepo.createBranch(UserId.of(resource.createdBy()));
             Path file = gitRepo.getRepoPath().resolve(resource.resourcePath());
             if (!Files.exists(file)) {
@@ -249,6 +250,9 @@ public class FileRepository implements AutoCloseable {
             if (resource.data() != null) {
                 Files.write(file, resource.data().getBytes());
             }
+            gitRepo.add(resource.resourcePath());
+            gitRepo.commit("Added resource %s".formatted(resource.resourcePath()));
+            gitRepo.push();
             /*
             branch.addFile(file);
             branch.commit("Added resource %s".formatted(resource.resourcePath()));
