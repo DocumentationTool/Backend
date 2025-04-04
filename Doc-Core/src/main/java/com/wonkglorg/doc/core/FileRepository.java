@@ -116,7 +116,6 @@ public class FileRepository implements AutoCloseable {
 
             Set<Path> filesToCheck = foundFiles.stream().map(this::relativizePathToRepo).collect(Collectors.toSet());
 
-
             checkFileChanges(filesToCheck);
 
             log.info("Scheduling check for changes in '{}'", repoProperty.getId());
@@ -190,11 +189,20 @@ public class FileRepository implements AutoCloseable {
 
     public Path relativizePathToRepo(Path path) {
         try {
-            return gitRepo.getRepoPath().relativize(path);
-        }catch (Exception e){
+            Path repoPath = gitRepo.getRepoPath().toAbsolutePath().normalize();
+            Path fullPath = path.toAbsolutePath().normalize();
+
+            if (fullPath.startsWith(repoPath)) {
+                return repoPath.relativize(fullPath);
+            } else {
+                return path;
+            }
+        } catch (Exception e) {
             return path;
         }
     }
+
+
 
     public void addDataDb() {
         Path repoRoot = gitRepo.getRepoPath();
@@ -203,11 +211,15 @@ public class FileRepository implements AutoCloseable {
         if (!fileToAdd.startsWith(repoRoot)) {
             log.warn("The file {} is not inside the Git repo {}", fileToAdd, repoRoot);
         }
-
-
         Path absolutePath = dataDB.getOpenInPath();
-        Path relativePath = gitRepo.getRepoPath().relativize(absolutePath);
-        gitRepo.add(relativePath);
+        Path toPut = absolutePath;
+        try {
+            toPut = gitRepo.getRepoPath().relativize(absolutePath);
+        }catch (Exception e){
+            //
+        }
+
+        gitRepo.add(toPut);
         gitRepo.add(dataDB.getOpenInPath());
     }
 

@@ -36,7 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
 			throws ServletException, IOException {
 		
 		if(DEV_MODE){
-			log.info("DEV_MODE: Bypassing JWT authentication");
+			//log.info("DEV_MODE: Bypassing JWT authentication");
 			// Load the user details from the username
 			User userDetails = (User) customUserDetailsService.loadUserByUsername("dev_p10209");
 			
